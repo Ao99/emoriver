@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "353647319941",
+    "project_id": "emoriver99",
+    "storage_bucket": "emoriver99.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353647319941:android:8fb268bb2fbae21f4142ec",
+        "android_client_info": {
+          "package_name": "com.emoriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "353647319941-10rn5pnr9jt4of5mggto22p8k5gpbbp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgpYkB-P0SoQvnEo9SjseW_lxxhaFWyjA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "353647319941-10rn5pnr9jt4of5mggto22p8k5gpbbp4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
