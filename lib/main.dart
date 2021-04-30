@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/homePage.dart';
+import 'pages/loadingPage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +21,7 @@ class App extends StatelessWidget {
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          return null;
+          return Container(width: 0.0, height: 0.0);
         }
 
         // Once complete, show your application
@@ -29,25 +31,17 @@ class App extends StatelessWidget {
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
-            home: MyHomePage(title: 'Flutter Demo Home Page'),
+            home: HomePage(title: 'Flutter Demo Home Page'),
           );
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return Scaffold(
-          appBar: AppBar(
-            title: Text("Loading"),
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
           ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Loading...',
-                ),
-              ],
-            ),
-          ),
+          home: LoadingPage(title: 'Loading Page'),
         );
       },
     );
