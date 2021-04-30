@@ -44,3 +44,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# OS generated files #
+.DS_Store?
+ehthumbs.db
+._*
+Thumbs.db
