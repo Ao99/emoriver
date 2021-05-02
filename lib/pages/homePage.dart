@@ -11,26 +11,45 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin, RestorationMixin {
   TabController _tabController;
+  RestorableInt tabIndex = RestorableInt(0);
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: tabCount);
+    _tabController = TabController(vsync: this, length: tabCount)
+      ..addListener(() {
+        setState(() {
+          tabIndex.value = _tabController.index;
+        });
+      });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    tabIndex.dispose();
     super.dispose();
   }
 
   @override
+  String get restorationId => "home_page";
+
+  @override
+  void restoreState(RestorationBucket oldBucket, bool initialRestore) {
+    registerForRestoration(tabIndex, "tab_index");
+    _tabController.index = tabIndex.value;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDesktop = isDisplayDesktop(context);
-    
+    final ThemeData theme = Theme.of(context);
+    final bool isDesktop = isDisplayDesktop(context);
+    final int quarterTurns = 2;
+    final int revertQuarterTurns = 4 - quarterTurns;
+
     Widget tabBarView;
     if(isDesktop) {
       tabBarView = Row(
@@ -51,9 +70,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 SizedBox(height: 24),
                 RotatedTabBar(
                   tabs: buildTabs(
-                      context: context, theme: theme, quarterTurns: 1),
+                      tabController: _tabController,
+                      theme: theme,
+                      quarterTurns: revertQuarterTurns),
                   tabController: _tabController,
-                  quarterTurns: 1,
+                  quarterTurns: quarterTurns,
                 ),
               ],
             ),
@@ -62,7 +83,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: RotatedTabView(
               tabViews: buildTabViews(),
               tabController: _tabController,
-              quarterTurns: 1,
+              quarterTurns: quarterTurns,
             ),
           ),
         ],
@@ -77,7 +98,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
           ),
           RotatedTabBar(
-            tabs: buildTabs(context: context, theme: theme),
+            tabs: buildTabs(tabController: _tabController, theme: theme),
             tabController: _tabController,
           ),
         ],

@@ -1,18 +1,53 @@
+import 'package:emoriver/widgets/rotatedTab.dart';
 import 'package:flutter/material.dart';
 
-final tabCount = 3;
+final tabCount = 4;
 
 List<Widget> buildTabs(
-  {BuildContext context, ThemeData theme, int quarterTurns = 0}) =>
+  {TabController tabController, ThemeData theme, int quarterTurns = 0}) =>
   [
-    Tab(icon: Icon(Icons.directions_car)),
-    Tab(icon: Icon(Icons.directions_transit)),
-    Tab(icon: Icon(Icons.directions_bike)),
+    RotatedTab(
+      theme: theme,
+      iconData: Icons.date_range,
+      title: 'Records',
+      tabIndex: 0,
+      tabCount: tabCount,
+      tabController: tabController,
+      quarterTurns: quarterTurns,
+    ),
+    RotatedTab(
+      theme: theme,
+      iconData: Icons.location_on,
+      title: 'Locations',
+      tabIndex: 1,
+      tabCount: tabCount,
+      tabController: tabController,
+      quarterTurns: quarterTurns,
+    ),
+    RotatedTab(
+      theme: theme,
+      iconData: Icons.people_alt,
+      title: 'Interactions',
+      tabIndex: 2,
+      tabCount: tabCount,
+      tabController: tabController,
+      quarterTurns: quarterTurns,
+    ),
+    RotatedTab(
+      theme: theme,
+      iconData: Icons.settings,
+      title: 'Settings',
+      tabIndex: 3,
+      tabCount: tabCount,
+      tabController: tabController,
+      quarterTurns: quarterTurns,
+    ),
   ];
 
 List<Widget> buildTabViews() =>
   [
     Icon(Icons.directions_car),
     Icon(Icons.directions_transit),
+    Icon(Icons.directions_bike),
     Icon(Icons.directions_bike),
   ];
