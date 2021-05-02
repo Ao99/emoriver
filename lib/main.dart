@@ -1,48 +1,32 @@
+import 'package:emoriver/themes/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'pages/routes.dart' as routes;
 import 'pages/homePage.dart';
-import 'pages/loadingPage.dart';
+import 'pages/loginPage.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  final FirebaseApp firebaseApp = await Firebase.initializeApp();
+  runApp(EmoriverApp(firebaseApp: firebaseApp));
 }
 
-class App extends StatelessWidget {
-  // Create the initialization Future outside of `build`:
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+class EmoriverApp extends StatelessWidget {
+  EmoriverApp({Key key, this.firebaseApp}) : super(key: key);
+
+  final FirebaseApp firebaseApp;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      // Initialize FlutterFire:
-      future: _initialization,
-      builder: (context, snapshot) {
-        // Check for errors
-        if (snapshot.hasError) {
-          return Container(width: 0.0, height: 0.0);
-        }
-
-        // Once complete, show your application
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            title: 'Flutter Demo',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            home: HomePage(title: 'Flutter Demo Home Page'),
-          );
-        }
-
-        // Otherwise, show something whilst waiting for initialization to complete
-        return MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: LoadingPage(title: 'Loading Page'),
-        );
+    return MaterialApp(
+      title: 'Emoriver',
+      debugShowCheckedModeBanner: false,
+      theme: buildTheme(),
+      initialRoute: routes.home,
+      routes: {
+        routes.home: (context) => HomePage(title: 'Flutter Demo Home Page'),
+        routes.login: (context) => LoginPage(title: 'Flutter Demo Home Page'),
       },
     );
   }
