@@ -44,10 +44,15 @@ List<Widget> buildTabs(
     ),
   ];
 
-List<Widget> buildTabViews() =>
+List<Widget> buildTabViews({int quarterTurns = 0}) =>
   [
     Icon(Icons.directions_car),
     Icon(Icons.directions_transit),
     Icon(Icons.directions_bike),
     Icon(Icons.directions_bike),
-  ];
+  ].map((tabView) =>
+    RotatedBox(
+      quarterTurns: quarterTurns,
+      child: tabView,
+    )
+  ).toList();

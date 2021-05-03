@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final bool isDesktop = isDisplayDesktop(context);
-    final int quarterTurns = 2;
+    final int quarterTurns = 1;
     final int revertQuarterTurns = 4 - quarterTurns;
 
     Widget tabBarView;
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage>
           ),
           Expanded(
             child: RotatedTabView(
-              tabViews: buildTabViews(),
+              tabViews: buildTabViews(quarterTurns: revertQuarterTurns),
               tabController: _tabController,
               quarterTurns: quarterTurns,
             ),
@@ -112,11 +112,6 @@ class _HomePageState extends State<HomePage>
           policy: OrderedTraversalPolicy(),
           child: tabBarView,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: null,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
