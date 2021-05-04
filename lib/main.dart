@@ -2,7 +2,7 @@ import 'package:emoriver/themes/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'pages/routes.dart' as routes;
+import 'pages/routes.dart';
 import 'pages/homePage.dart';
 import 'pages/loginPage.dart';
 import 'pages/addPage.dart';
@@ -23,12 +23,12 @@ class EmoriverApp extends StatelessWidget {
     return MaterialApp(
       title: 'Emoriver',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
-      initialRoute: routes.home,
+      theme: AppTheme.buildTheme(),
+      initialRoute: AppRoute.home,
       routes: {
-        routes.home: (context) => HomePage(),
-        routes.login: (context) => LoginPage(),
-        routes.add: (context) => AddPage(),
+        AppRoute.home: (context) => HomePage(),
+        AppRoute.login: (context) => LoginPage(),
+        AppRoute.add: (context) => AddPage(),
       },
     );
   }

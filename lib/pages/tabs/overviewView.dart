@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../routes.dart' as routes;
+import '../routes.dart';
 
 class OverviewView extends StatelessWidget {
   final IconData tabIcon = Icons.date_range;
@@ -10,7 +10,7 @@ class OverviewView extends StatelessWidget {
       body: Center(child: Icon(tabIcon)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.of(context)
-            .restorablePushNamed(routes.add),
+            .restorablePushNamed(AppRoute.add),
         heroTag: 'hero-add',
         child: Icon(Icons.add),
       ),

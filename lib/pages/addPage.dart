@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'routes.dart' as routes;
+import 'routes.dart';
 
 class AddPage extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class _AddPageState extends State<AddPage> {
         child: FittedBox(
           child: FloatingActionButton(
             onPressed: () => Navigator.of(context)
-                .restorablePushNamed(routes.home),
+                .restorablePushNamed(AppRoute.home),
             heroTag: 'hero-add',
             child: Icon(Icons.add),
           ),
