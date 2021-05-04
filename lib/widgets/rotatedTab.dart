@@ -33,7 +33,7 @@ class RotatedTab extends StatefulWidget {
     this.tabCount,
     TabController tabController,
     this.quarterTurns,
-  }) : titleText = Text(title, style: theme.textTheme.button),
+  }) :  titleText = Text(title, style: theme.textTheme.button),
         isExpanded = tabController.index == tabIndex,
         icon = Icon(iconData, semanticLabel: title),
         isVertical = quarterTurns % 2 == 1;
@@ -141,24 +141,5 @@ class _RotatedTabState extends State<RotatedTab>
         ),
       );
     }
-  }
-}
-
-class RotatedTabView extends StatelessWidget {
-  RotatedTabView({Key key, this.tabViews, this.tabController, this.quarterTurns = 0}) : super(key: key);
-  final List<Widget> tabViews;
-  final TabController tabController;
-  final int quarterTurns;
-
-  @override
-  Widget build(BuildContext context) {
-    final int revertQuarterTurns = 4 - quarterTurns;
-    return RotatedBox(
-      quarterTurns: quarterTurns,
-      child: TabBarView(
-        children: tabViews,
-        controller: tabController,
-      ),
-    );
   }
 }

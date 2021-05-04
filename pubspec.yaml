@@ -33,6 +33,7 @@ dependencies:
   adaptive_breakpoints: 0.0.4
   google_fonts: ^2.0.0
   animations: ^2.0.0
+  tuple: 2.0.0
 
 dev_dependencies:
   flutter_test:

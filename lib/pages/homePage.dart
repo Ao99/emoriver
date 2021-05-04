@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: tabCount)
+    _tabController = TabController(vsync: this, length: tabsInfo.length)
       ..addListener(() {
         setState(() {
           tabIndex.value = _tabController.index;
@@ -80,10 +80,12 @@ class _HomePageState extends State<HomePage>
             ),
           ),
           Expanded(
-            child: RotatedTabView(
-              tabViews: buildTabViews(quarterTurns: revertQuarterTurns),
-              tabController: _tabController,
+            child: RotatedBox(
               quarterTurns: quarterTurns,
+              child: TabBarView(
+                children: buildTabViews(quarterTurns: revertQuarterTurns),
+                controller: _tabController,
+              ),
             ),
           ),
         ],
@@ -92,9 +94,9 @@ class _HomePageState extends State<HomePage>
       tabBarView = Column(
         children: [
           Expanded(
-            child: RotatedTabView(
-              tabViews: buildTabViews(),
-              tabController: _tabController,
+            child: TabBarView(
+              children: buildTabViews(),
+              controller: _tabController,
             ),
           ),
           RotatedTabBar(
