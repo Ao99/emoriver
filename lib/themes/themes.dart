@@ -7,7 +7,11 @@ import 'colors.dart';
 ThemeData buildTheme() {
   final base = ThemeData.dark();
   return ThemeData(
-    appBarTheme: const AppBarTheme(brightness: Brightness.dark, elevation: 0),
+    appBarTheme: AppBarTheme(brightness: Brightness.dark, elevation: 0),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: ThemeColors.buttonColor,
+      hoverColor: ThemeColors.buttonHoverColor,
+    ),
     scaffoldBackgroundColor: ThemeColors.primaryBackground,
     primaryColor: ThemeColors.primaryBackground,
     focusColor: ThemeColors.focusColor,

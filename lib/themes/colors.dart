@@ -30,6 +30,7 @@ class ThemeColors {
   static const Color inputBackground = Color(0xFF26282F);
   static const Color cardBackground = Color(0x03FEFEFE);
   static const Color buttonColor = Color(0xFF09AF79);
+  static const Color buttonHoverColor = Color(0xFF0CD392);
   static const Color focusColor = Color(0xCCFFFFFF);
   static const Color dividerColor = Color(0xAA282828);
 
