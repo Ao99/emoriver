@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/routes.dart' as routes;
 import 'pages/homePage.dart';
 import 'pages/loginPage.dart';
+import 'pages/addPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +26,9 @@ class EmoriverApp extends StatelessWidget {
       theme: buildTheme(),
       initialRoute: routes.home,
       routes: {
-        routes.home: (context) => HomePage(title: 'Flutter Demo Home Page'),
-        routes.login: (context) => LoginPage(title: 'Flutter Demo Home Page'),
+        routes.home: (context) => HomePage(),
+        routes.login: (context) => LoginPage(),
+        routes.add: (context) => AddPage(),
       },
     );
   }
