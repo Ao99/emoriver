@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'tabs/tabs.dart';
-import '../themes/colors.dart';
+import '../utils/colors.dart';
 import '../widgets/rotatedTab.dart';
 import '../widgets/expandableFab.dart';
 import '../widgets/circleButton.dart';
@@ -55,14 +55,19 @@ class _HomePageState extends State<HomePage>
       body: SafeArea(
         top: !isDesktop,
         bottom: !isDesktop,
-        child: FocusTraversalGroup(
-          policy: OrderedTraversalPolicy(),
-          child: _buildTabBarWithViews(isDesktop),
+        child: Stack(
+          children: [
+            FocusTraversalGroup(
+              policy: OrderedTraversalPolicy(),
+              child: _buildTabBarWithViews(isDesktop),
+            ),
+            ExpandableFab(
+              radius: 100,
+              icon: Icon(Icons.add),
+              children: _buildFabChildren(),
+            ),
+          ]
         ),
-      ),
-      floatingActionButton: ExpandableFab(
-        distance: 275,
-        children: _buildFabChildren(),
       ),
     );
   }

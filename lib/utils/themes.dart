@@ -12,7 +12,6 @@ class AppTheme {
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: ThemeColors.buttonColor,
         foregroundColor: ThemeColors.primaryBackground,
-        hoverColor: ThemeColors.buttonHoverColor,
       ),
       scaffoldBackgroundColor: ThemeColors.primaryBackground,
       primaryColor: ThemeColors.primaryBackground,

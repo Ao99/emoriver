@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../themes/colors.dart';
+import '../../utils/colors.dart';
 import '../../widgets/circleButton.dart';
 
 class OverviewView extends StatelessWidget {

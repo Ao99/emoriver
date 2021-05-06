@@ -1,8 +1,8 @@
-import 'package:emoriver/themes/themes.dart';
+import 'package:emoriver/utils/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'pages/routes.dart';
+import 'utils/routes.dart';
 import 'pages/homePage.dart';
 import 'pages/loginPage.dart';
 import 'pages/addPage.dart';
