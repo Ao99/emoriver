@@ -26,24 +26,24 @@ class RotatedTabBar extends StatelessWidget {
 
 class RotatedTab extends StatefulWidget {
   RotatedTab({
-    ThemeData theme,
     IconData iconData,
-    String title,
+    this.title,
     int tabIndex,
     this.tabCount,
     TabController tabController,
-    this.quarterTurns,
-  }) :  titleText = Text(title, style: theme.textTheme.button),
-        isExpanded = tabController.index == tabIndex,
+    this.quarterTurns = 0,
+    this.leftOrTopPadding,
+}) :  isExpanded = tabController.index == tabIndex,
         icon = Icon(iconData, semanticLabel: title),
         isVertical = quarterTurns % 2 == 1;
 
-  final Text titleText;
+  final String title;
   final Icon icon;
   final int tabCount;
   final bool isExpanded;
   final int quarterTurns;
   final bool isVertical;
+  final double leftOrTopPadding;
 
   @override
   _RotatedTabState createState() => _RotatedTabState();
@@ -82,6 +82,8 @@ class _RotatedTabState extends State<RotatedTab>
 
   @override
   Widget build(BuildContext context) {
+    Text titleText = Text(widget.title, style: Theme.of(context).textTheme.button);
+
     if(widget.isVertical) {
       return RotatedBox(
         quarterTurns: widget.quarterTurns,
@@ -99,7 +101,7 @@ class _RotatedTabState extends State<RotatedTab>
                 sizeFactor: _titleSizeAnimation,
                 axis: Axis.vertical,
                 axisAlignment: -1,
-                child: Center(child: ExcludeSemantics(child: widget.titleText)),
+                child: Center(child: ExcludeSemantics(child: titleText)),
               ),
             ),
             SizedBox(height: 18),
@@ -108,8 +110,9 @@ class _RotatedTabState extends State<RotatedTab>
       );
     } else {
       final width = MediaQuery.of(context).size.width;
-      final expandedTitleWidthMultiplier = 1;
-      final unitWidth = width / (widget.tabCount + expandedTitleWidthMultiplier);
+      final expandedTitleWidthMultiplier = 2;
+      final unitWidth = (width - widget.leftOrTopPadding)
+          / (widget.tabCount + expandedTitleWidthMultiplier);
 
       return RotatedBox(
         quarterTurns: widget.quarterTurns,
@@ -132,7 +135,7 @@ class _RotatedTabState extends State<RotatedTab>
                   axisAlignment: -1,
                   child: SizedBox(
                     width: unitWidth * expandedTitleWidthMultiplier,
-                    child: Center(child: ExcludeSemantics(child: widget.titleText)),
+                    child: ExcludeSemantics(child: titleText),
                   ),
                 ),
               ),

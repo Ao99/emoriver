@@ -1,6 +1,13 @@
 import 'dart:ui';
 
 class ThemeColors {
+  static const Color happy = Color(0xFFFFAC12);
+  static const Color sad = Color(0xFF254E7B);
+  static const Color calm = Color(0xFF007D51);
+  static const Color angry = Color(0xFF9D3E2E);
+  static const Color intrigued = Color(0xFF82D5B5);
+  static const Color bored = Color(0x99575757);
+
   static const List<Color> accountColors = <Color>[
     Color(0xFF005D57),
     Color(0xFF04B97F),
@@ -33,6 +40,7 @@ class ThemeColors {
   static const Color buttonHoverColor = Color(0xFF0CD392);
   static const Color focusColor = Color(0xCCFFFFFF);
   static const Color dividerColor = Color(0xAA282828);
+  static const Color cancelColor = Color(0xFFFF6951);
 
   /// Convenience method to get a single account color with position i.
   static Color accountColor(int i) {

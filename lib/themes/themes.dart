@@ -11,10 +11,12 @@ class AppTheme {
       appBarTheme: AppBarTheme(brightness: Brightness.dark, elevation: 0),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: ThemeColors.buttonColor,
+        foregroundColor: ThemeColors.primaryBackground,
         hoverColor: ThemeColors.buttonHoverColor,
       ),
       scaffoldBackgroundColor: ThemeColors.primaryBackground,
       primaryColor: ThemeColors.primaryBackground,
+      accentColor: ThemeColors.cancelColor,
       focusColor: ThemeColors.focusColor,
       textTheme: _buildTextTheme(base.textTheme),
       inputDecorationTheme: const InputDecorationTheme(

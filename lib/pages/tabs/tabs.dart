@@ -23,16 +23,16 @@ final tabViews =
 ];
 
 List<Widget> buildTabs(
-  {TabController tabController, ThemeData theme, int quarterTurns = 0}) =>
+  {TabController tabController, int quarterTurns = 0, leftOrTopPadding = 0}) =>
     tabsInfo.asMap().entries.map((e) =>
       RotatedTab(
-        theme: theme,
         iconData: e.value.item1,
         title: e.value.item2,
         tabIndex: e.key,
         tabCount: tabsInfo.length,
         tabController: tabController,
         quarterTurns: quarterTurns,
+        leftOrTopPadding: leftOrTopPadding,
     )).toList();
 
 List<Widget> buildTabViews({int quarterTurns = 0}) =>
