@@ -1,26 +1,104 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:vector_math/vector_math.dart' show radians;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class RadialFab extends StatefulWidget {
+  RadialFab({
+    Key key,
+    this.radius = 100,
+    this.padding = 16,
+    this.alignment = Alignment.bottomRight,
+    this.icon = Icons.menu,
+    this.children,
+  }) : super(key: key);
+
+  final double radius;
+  final double padding;
+  final Alignment alignment;
+  final IconData icon;
+  final List<Widget> children;
+
   createState() => _RadialFabState();
 }
 
-class _RadialFabState extends State<RadialFab> with SingleTickerProviderStateMixin {
-
+class _RadialFabState extends State<RadialFab>
+    with SingleTickerProviderStateMixin {
   AnimationController controller;
+  Animation<double> expandAnimation;
+  bool open;
 
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(duration: Duration(milliseconds: 900), vsync: this);
-    // ..addListener(() => setState(() {}));
+    open = false;
+    controller = AnimationController(
+        duration: Duration(milliseconds: 500),
+        vsync: this
+    );
+    expandAnimation = CurvedAnimation(
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.easeOutQuad,
+      parent: controller,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return RadialAnimation(controller: controller);
+    return Stack(
+      alignment: Alignment.center,
+        children: [
+          open
+            ? SizedBox.expand(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(color: Colors.transparent),
+                ),
+              )
+            : Container(),
+          AnimatedBuilder(
+            animation: expandAnimation,
+            builder: (context, widget) {
+              return Transform.scale(
+                scale: expandAnimation.value,
+                child: Transform.rotate(
+                  angle: 2 * pi * expandAnimation.value,
+                  child: SizedBox.expand(
+                    child: Stack(
+                        alignment: Alignment.center,
+                        children: _buildExpandingButtons()
+                    ),
+                  ),
+                )
+              );
+            }
+          ),
+          Container(
+            padding: EdgeInsets.all(widget.padding),
+            alignment: widget.alignment,
+            child: AnimatedCrossFade(
+              firstChild: FloatingActionButton(
+                onPressed: _toggle,
+                backgroundColor: Theme.of(context).accentColor,
+                child: Icon(Icons.close),
+              ),
+              secondChild: FloatingActionButton(
+                onPressed: _toggle,
+                child: Icon(widget.icon),
+              ),
+              crossFadeState: open ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+              duration: Duration(milliseconds: 250)
+            ),
+          )
+    ]
+    );
+  }
+
+  _toggle() {
+    setState(() => open = !open);
+    open
+      ? controller.forward()
+      : controller.reverse();
   }
 
   @override
@@ -28,102 +106,24 @@ class _RadialFabState extends State<RadialFab> with SingleTickerProviderStateMix
     controller.dispose();
     super.dispose();
   }
-}
 
-
-class RadialAnimation extends StatelessWidget {
-  RadialAnimation({ Key key, this.controller }) :
-
-        translation = Tween<double>(
-          begin: 0.0,
-          end: 100.0,
-        ).animate(
-          CurvedAnimation(
-              parent: controller,
-              curve: Curves.elasticOut
+  List<Widget> _buildExpandingButtons() {
+    int count = widget.children.length;
+    double step = 2 * pi / count;
+    double rad = count % 2 == 0 ? pi : -pi/2;
+    double maxDistance = widget.radius;
+    return widget.children.map(
+      (widget) {
+        Widget res = Transform.translate(
+          offset: Offset.fromDirection(
+            rad,
+            expandAnimation.value * maxDistance
           ),
-        ),
-
-        scale = Tween<double>(
-          begin: 1.5,
-          end: 0.0,
-        ).animate(
-          CurvedAnimation(
-              parent: controller,
-              curve: Curves.fastOutSlowIn
-          ),
-        ),
-
-        rotation = Tween<double>(
-          begin: 0.0,
-          end: 360.0,
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Interval(
-              0.0, 0.7,
-              curve: Curves.decelerate,
-            ),
-          ),
-        ),
-
-        super(key: key);
-
-  final AnimationController controller;
-  final Animation<double> rotation;
-  final Animation<double> translation;
-  final Animation<double> scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-        animation: controller,
-        builder: (context, widget) {
-          return Transform.rotate(
-              angle: radians(rotation.value),
-              child: Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    _buildButton(0, color: Colors.red, icon: FontAwesomeIcons.thumbtack),
-                    _buildButton(45, color: Colors.green, icon:FontAwesomeIcons.sprayCan),
-                    _buildButton(90, color: Colors.orange, icon: FontAwesomeIcons.fire),
-                    _buildButton(135, color: Colors.blue, icon:FontAwesomeIcons.kiwiBird),
-                    _buildButton(180, color: Colors.black, icon:FontAwesomeIcons.cat),
-                    _buildButton(225, color: Colors.indigo, icon:FontAwesomeIcons.paw),
-                    _buildButton(270, color: Colors.pink, icon: FontAwesomeIcons.bong),
-                    _buildButton(315, color: Colors.yellow, icon:FontAwesomeIcons.bolt),
-                    Transform.scale(
-                      scale: scale.value - 1,
-                      child: FloatingActionButton(child: Icon(FontAwesomeIcons.timesCircle), onPressed: _close, backgroundColor: Colors.red),
-                    ),
-                    Transform.scale(
-                      scale: scale.value,
-                      child: FloatingActionButton(child: Icon(FontAwesomeIcons.solidDotCircle), onPressed: _open),
-                    )
-
-                  ])
-          );
-        });
-  }
-
-  _open() {
-    controller.forward();
-  }
-
-  _close() {
-    controller.reverse();
-  }
-
-  _buildButton(double angle, { Color color, IconData icon }) {
-    final double rad = radians(angle);
-    return Transform(
-        transform: Matrix4.identity()..translate(
-            (translation.value) * cos(rad),
-            (translation.value) * sin(rad)
-        ),
-
-        child: FloatingActionButton(
-            child: Icon(icon), backgroundColor: color, onPressed: _close, elevation: 0)
-    );
+          child: widget,
+        );
+        rad += step;
+        return res;
+      }
+    ).toList();
   }
 }
