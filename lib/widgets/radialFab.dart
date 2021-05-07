@@ -1,7 +1,6 @@
 import 'dart:ui';
-
-import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:flutter/material.dart';
 
 class RadialFab extends StatefulWidget {
   RadialFab({
