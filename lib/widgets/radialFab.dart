@@ -9,6 +9,7 @@ class RadialFab extends StatefulWidget {
     this.padding = 16,
     this.alignment = Alignment.bottomRight,
     this.icon = Icons.menu,
+    this.duration = const Duration(milliseconds: 500),
     this.children,
   }) : super(key: key);
 
@@ -16,6 +17,7 @@ class RadialFab extends StatefulWidget {
   final double padding;
   final Alignment alignment;
   final IconData icon;
+  final Duration duration;
   final List<Widget> children;
 
   createState() => _RadialFabState();
@@ -32,7 +34,7 @@ class _RadialFabState extends State<RadialFab>
     super.initState();
     open = false;
     controller = AnimationController(
-        duration: Duration(milliseconds: 500),
+        duration: widget.duration,
         vsync: this
     );
     expandAnimation = CurvedAnimation(
@@ -56,7 +58,7 @@ class _RadialFabState extends State<RadialFab>
             )
           : Container(),
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 500),
+          duration: widget.duration,
           child: open
             ? AnimatedBuilder(
                 animation: expandAnimation,
@@ -85,7 +87,9 @@ class _RadialFabState extends State<RadialFab>
               child: Icon(widget.icon),
             ),
             crossFadeState: open ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-            duration: Duration(milliseconds: 250)
+            duration: widget.duration,
+            firstCurve: Curves.fastOutSlowIn,
+            secondCurve: Curves.easeOutQuad,
           ),
         )
       ]
