@@ -46,50 +46,49 @@ class _RadialFabState extends State<RadialFab>
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
-        children: [
-          open
-            ? SizedBox.expand(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                  child: Container(color: Colors.transparent),
-                ),
+      children: [
+        open
+          ? SizedBox.expand(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(color: Colors.transparent),
+              ),
+            )
+          : Container(),
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 500),
+          child: open
+            ? AnimatedBuilder(
+                animation: expandAnimation,
+                builder: (context, widget) {
+                  return SizedBox.expand(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: _buildExpandingButtons()
+                    ),
+                  );
+                },
               )
             : Container(),
-          AnimatedBuilder(
-            animation: expandAnimation,
-            builder: (context, widget) {
-              return Transform.scale(
-                scale: expandAnimation.value,
-                child: Transform.rotate(
-                  angle: 2 * pi * expandAnimation.value,
-                  child: SizedBox.expand(
-                    child: Stack(
-                        alignment: Alignment.center,
-                        children: _buildExpandingButtons()
-                    ),
-                  ),
-                )
-              );
-            }
-          ),
-          Container(
-            padding: EdgeInsets.all(widget.padding),
-            alignment: widget.alignment,
-            child: AnimatedCrossFade(
-              firstChild: FloatingActionButton(
-                onPressed: _toggle,
-                backgroundColor: Theme.of(context).accentColor,
-                child: Icon(Icons.close),
-              ),
-              secondChild: FloatingActionButton(
-                onPressed: _toggle,
-                child: Icon(widget.icon),
-              ),
-              crossFadeState: open ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-              duration: Duration(milliseconds: 250)
+        ),
+        Container(
+          padding: EdgeInsets.all(widget.padding),
+          alignment: widget.alignment,
+          child: AnimatedCrossFade(
+            firstChild: FloatingActionButton(
+              onPressed: _toggle,
+              backgroundColor: Theme.of(context).accentColor,
+              child: Icon(Icons.close),
             ),
-          )
-    ]
+            secondChild: FloatingActionButton(
+              onPressed: _toggle,
+              child: Icon(widget.icon),
+            ),
+            crossFadeState: open ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            duration: Duration(milliseconds: 250)
+          ),
+        )
+      ]
     );
   }
 
@@ -118,7 +117,10 @@ class _RadialFabState extends State<RadialFab>
             rad,
             expandAnimation.value * maxDistance
           ),
-          child: widget,
+          child: Transform.rotate(
+            angle: 2 * pi * expandAnimation.value,
+            child: widget,
+          )
         );
         rad += step;
         return res;
