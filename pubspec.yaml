@@ -30,6 +30,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^1.1.0
   firebase_auth: ^1.1.2
+  cloud_firestore: ^2.0.0
   adaptive_breakpoints: 0.0.4
   google_fonts: ^2.0.0
   animations: ^2.0.0
