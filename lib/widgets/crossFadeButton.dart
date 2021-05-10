@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class CrossFadeButton extends StatefulWidget {
@@ -6,50 +7,35 @@ class CrossFadeButton extends StatefulWidget {
     this.size = 100,
     this.elevation = 8,
     this.padding = 12,
+    this.duration = const Duration(seconds: 3),
     this.color,
     this.onPressed,
     this.firstChild = '',
     this.secondChild = '',
+    this.animation,
   }) : super(key: key);
 
   final double size;
   final double elevation;
   final double padding;
+  final Duration duration;
   final Color color;
   final Function onPressed;
   final String firstChild;
   final String secondChild;
+  final Animation<double> animation;
 
   @override
   _CrossFadeButtonState createState() => _CrossFadeButtonState();
 }
 
-class _CrossFadeButtonState extends State<CrossFadeButton>
-  with SingleTickerProviderStateMixin{
-  AnimationController controller;
-  Animation<double> curveAnimation;
-  Animation<Color> topColorAnimation;
-  Animation<Color> bottomColorAnimation;
+class _CrossFadeButtonState extends State<CrossFadeButton> {
+  Animation<double> animation;
 
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(
-      duration: Duration(seconds: 3),
-      vsync: this,
-    )..repeat(reverse: true);
-    curveAnimation = CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOutQuad
-    );
-    topColorAnimation = ColorTween(
-      begin: widget.color,
-      end: Colors.grey.shade400,
-    ).animate(curveAnimation);
-    bottomColorAnimation = ColorTween(
-      begin: Colors.grey.shade800,
-      end: widget.color,
-    ).animate(curveAnimation);
+    animation = widget.animation;
   }
 
   @override
@@ -60,56 +46,45 @@ class _CrossFadeButtonState extends State<CrossFadeButton>
     String secondChild = widget.secondChild;
     double padding = widget.padding;
     double size = widget.size;
+    Color color = widget.color;
 
     return AnimatedBuilder(
-      animation: curveAnimation,
-      builder: (context, widget) => Container(
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomCenter,
-              colors: [
-                topColorAnimation.value,
-                bottomColorAnimation.value,
-              ],
-            )
-        ),
-        child: RawMaterialButton(
-          elevation: elevation,
-          // fillColor: color,
-          onPressed: onPressed,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Text(
-                firstChild,
-                // textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(curveAnimation.value),
-                ),
-              ),
-              Text(
-                secondChild,
-                // textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(1-curveAnimation.value),
-                ),
-              ),
-            ],
+      animation: animation,
+      builder: (context, widget) => Transform(
+        alignment: FractionalOffset.center,
+        transform: Matrix4.identity()
+          ..rotateY(pi * animation.value),
+        child: Container(
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomCenter,
+                colors: animation.value<0.5
+                  ? [Colors.grey.shade400, color]
+                  : [color, Colors.grey.shade800],
+              )
           ),
-          padding: EdgeInsets.all(padding),
-          shape: CircleBorder(),
-          constraints: BoxConstraints.tightFor(width: size, height: size),
+          child: RawMaterialButton(
+            elevation: elevation,
+            // fillColor: color,
+            onPressed: onPressed,
+            child: Transform(
+              alignment: FractionalOffset.center,
+              transform: Matrix4.identity()
+                ..rotateY(pi * (animation.value)),
+              child: Text(
+                animation.value<0.5 ? firstChild : secondChild,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            padding: EdgeInsets.all(padding),
+            shape: CircleBorder(),
+            constraints: BoxConstraints.tightFor(width: size, height: size),
+          ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }
 
