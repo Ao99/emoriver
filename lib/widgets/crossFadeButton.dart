@@ -72,7 +72,7 @@ class _CrossFadeButtonState extends State<CrossFadeButton> {
             child: Transform(
               alignment: FractionalOffset.center,
               transform: Matrix4.identity()
-                ..rotateY(pi * (animation.value)),
+                ..rotateY(pi * animation.value),
               child: Text(
                 animation.value<0.5 ? firstChild : secondChild,
                 textAlign: TextAlign.center,
