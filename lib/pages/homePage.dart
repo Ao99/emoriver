@@ -126,23 +126,20 @@ class _HomePageState extends State<HomePage>
   Widget _buildFab() => FutureBuilder(
     future: EmotionService.getAllEmotions(),
     builder: (BuildContext context,
-        AsyncSnapshot<QuerySnapshot<Emotion>> snapshot) {
+        AsyncSnapshot<List<Emotion>> snapshot) {
       if(snapshot.hasData) {
-        final children = snapshot.data.docs.map(
-          (doc) => CrossFadeButton(
+        final children = snapshot.data.map(
+          (e) => CrossFadeButton(
             onPressed: (){
               Navigator.pushNamed(
                 context,
                 AppRoute.add,
-                arguments: AddPageArguments(
-                  docId: doc.id,
-                  emotion: doc.data(),
-                ),
+                arguments: AddPageArguments(emotion: e),
               );
             },
-            color: Color(doc.data().color),
-            firstChild: doc.data().positive,
-            secondChild: doc.data().negative,
+            color: Color(e.color),
+            firstChild: e.positive,
+            secondChild: e.negative,
             animation: buttonAnimation,
           )
         ).toList();

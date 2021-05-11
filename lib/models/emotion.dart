@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
-
-@immutable
 class Emotion {
   Emotion({
+    this.docId,
     this.id,
     this.positive,
     this.negative,
@@ -16,6 +14,7 @@ class Emotion {
     color: json["color"] as int,
   );
 
+  String docId; // not in the doc, but the doc title
   final int id;
   final String positive;
   final String negative;

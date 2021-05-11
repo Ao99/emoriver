@@ -8,13 +8,25 @@ class EmotionService {
       fromFirestore: (snapshots,_) => Emotion.fromJson(snapshots.data()),
       toFirestore: (emotion,_) => emotion.toJson(),
     );
-  
-  static Future<QuerySnapshot<Emotion>> getAllEmotions() {
-    return emotionRef.orderBy('id').get();
+
+  static Future<List<Emotion>> getAllEmotions() {
+    return emotionRef.orderBy('id').get().then(
+      (snapshot) => snapshot.docs.map((doc) {
+        Emotion e = doc.data();
+        e.docId = doc.id;
+        return e;
+      }
+    ).toList());
   }
 
-  static Future<DocumentSnapshot<Emotion>> getEmotionByDocId(String docId) {
-    return emotionRef.doc(docId).get();
+  static Future<Emotion> getEmotionByDocId(String docId) {
+    return emotionRef.doc(docId).get().then(
+      (snapshot) {
+        Emotion e = snapshot.data();
+        e.docId = snapshot.id;
+        return e;
+      }
+    );
   }
 
 }
