@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'tabs/tabs.dart';
-import '../utils/colors.dart';
 import '../widgets/rotatedTab.dart';
-import '../widgets/expandableFab.dart';
-import '../widgets/circleButton.dart';
+import '../widgets/radialFab.dart';
+import '../widgets/crossFadeButton.dart';
 import '../utils/adaptive.dart';
+import '../utils/routes.dart';
+import '../services/emotionService.dart';
+import '../models/emotion.dart';
+import './addPage.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -15,8 +19,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin, RestorationMixin {
+    with TickerProviderStateMixin, RestorationMixin {
   TabController _tabController;
+  AnimationController buttonController;
+  Animation<double> buttonAnimation;
   RestorableInt tabIndex = RestorableInt(0);
   bool showBlur = false;
 
@@ -29,21 +35,30 @@ class _HomePageState extends State<HomePage>
           tabIndex.value = _tabController.index;
         });
       });
+    buttonController = AnimationController(
+      duration: Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+    buttonAnimation = CurvedAnimation(
+      parent: buttonController,
+      curve: Curves.easeInOutQuart,
+    );
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     tabIndex.dispose();
+    buttonController.dispose();
     super.dispose();
   }
 
   @override
-  String get restorationId => "home_page";
+  String get restorationId => 'home_page';
 
   @override
   void restoreState(RestorationBucket oldBucket, bool initialRestore) {
-    registerForRestoration(tabIndex, "tab_index");
+    registerForRestoration(tabIndex, 'tab_index');
     _tabController.index = tabIndex.value;
   }
 
@@ -61,11 +76,7 @@ class _HomePageState extends State<HomePage>
               policy: OrderedTraversalPolicy(),
               child: _buildTabBarWithViews(isDesktop),
             ),
-            ExpandableFab(
-              radius: 100,
-              icon: Icon(Icons.add),
-              children: _buildFabChildren(),
-            ),
+            _buildFab(),
           ]
         ),
       ),
@@ -112,52 +123,45 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  _buildFabChildren() {
-    return [
-      CircleButton(
-        color: ThemeColors.happy,
-        onTap: () {
-          print("happy");
-        },
-        child: Text("happy"),
-      ),
-      CircleButton(
-        color: ThemeColors.sad,
-        onTap: () {
-          print("sad");
-        },
-        child: Text("sad"),
-      ),
-      CircleButton(
-        color: ThemeColors.calm,
-        onTap: () {
-          print("calm");
-        },
-        child: Text("calm"),
-      ),
-      CircleButton(
-        color: ThemeColors.angry,
-        onTap: () {
-          print("angry");
-        },
-        child: Text("angry"),
-      ),
-      CircleButton(
-        color: ThemeColors.intrigued,
-        onTap: () {
-          print("intrigued");
-        },
-        child: Text("intrigued"),
-      ),
-      CircleButton(
-        color: ThemeColors.bored,
-        onTap: () {
-          print("bored");
-        },
-        child: Text("bored"),
-      ),
-    ];
-  }
+  Widget _buildFab() => FutureBuilder(
+    future: EmotionService.getAllEmotions(),
+    builder: (BuildContext context,
+        AsyncSnapshot<QuerySnapshot<Emotion>> snapshot) {
+      if(snapshot.hasData) {
+        final children = snapshot.data.docs.map(
+          (doc) => CrossFadeButton(
+            onPressed: (){
+              Navigator.pushNamed(
+                context,
+                AppRoute.add,
+                arguments: AddPageArguments(
+                  docId: doc.id,
+                  emotion: doc.data(),
+                ),
+              );
+            },
+            color: Color(doc.data().color),
+            firstChild: doc.data().positive,
+            secondChild: doc.data().negative,
+            animation: buttonAnimation,
+          )
+        ).toList();
+        return RadialFab(
+          radius: 120,
+          icon: Icons.add,
+          children: children,
+        );
+      } else if(snapshot.hasError) {
+        return Container();
+      } else {
+        return Container(
+          alignment: Alignment.bottomRight,
+          padding: EdgeInsets.all(16),
+          child: CircularProgressIndicator(),
+        );
+      }
+    },
+  );
 }
 
 class _RowOrColumn extends StatelessWidget {

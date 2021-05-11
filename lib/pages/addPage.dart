@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import '../models/emotion.dart';
 import '../utils/routes.dart';
 
 class AddPage extends StatefulWidget {
@@ -10,66 +10,31 @@ class AddPage extends StatefulWidget {
 class _AddPageState extends State<AddPage> {
   @override
   Widget build(BuildContext context) {
+    AddPageArguments arguments =
+        ModalRoute.of(context).settings.arguments as AddPageArguments;
+
     return Scaffold(
       body: Center(
-        child: Hero(
-          tag: "hero-add",
-          child: Stack(
-            children: [
-              CustomPaint(
-                painter: _RingPainter(
-                  startAngle: 0,
-                  color: Colors.yellowAccent,
-                ),
+        child: arguments == null
+          ? Container()
+          : Text(
+              '${arguments.docId}\n${arguments.emotion.toJson().toString()}',
+              style: TextStyle(
+                fontSize: 30,
               ),
-              CustomPaint(
-                painter: _RingPainter(
-                  startAngle: pi / 4,
-                  color: Colors.blueAccent,
-                ),
-              ),
-              CustomPaint(
-                painter: _RingPainter(
-                  startAngle: pi / 2,
-                  color: Colors.greenAccent,
-                ),
-              ),
-              CustomPaint(
-                painter: _RingPainter(
-                  startAngle: pi * 3 / 4,
-                  color: Colors.redAccent,
-                ),
-              ),
-            ],
-          )
-        ),
-      )
+            ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {Navigator.of(context).pop();},
+        backgroundColor: Theme.of(context).errorColor,
+        child: Icon(Icons.close),
+      ),
     );
   }
 }
 
-class _RingPainter extends CustomPainter {
-  _RingPainter({this.startAngle, this.color});
-  final double startAngle;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color ?? Colors.white
-      ..style = PaintingStyle.fill;
-
-    canvas.drawArc(
-        Rect.fromCircle(
-          center: Offset(size.width / 2, size.height / 2),
-          radius: 100,
-        ),
-        startAngle,
-        pi / 4,
-        true,
-        paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
+class AddPageArguments {
+  AddPageArguments({this.docId, this.emotion});
+  final String docId;
+  final Emotion emotion;
 }
