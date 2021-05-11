@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:math';
+import 'package:emoriver/utils/randomString.dart';
 import 'package:flutter/material.dart';
 
 class RadialFab extends StatefulWidget {
@@ -78,11 +79,13 @@ class _RadialFabState extends State<RadialFab>
           alignment: widget.alignment,
           child: AnimatedCrossFade(
             firstChild: FloatingActionButton(
+              heroTag: 'fab-'+getRandString(5),
               onPressed: _toggle,
               backgroundColor: Theme.of(context).accentColor,
               child: Icon(Icons.close),
             ),
             secondChild: FloatingActionButton(
+              heroTag: 'fab-'+getRandString(5),
               onPressed: _toggle,
               child: Icon(widget.icon),
             ),
