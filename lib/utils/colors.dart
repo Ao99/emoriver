@@ -1,12 +1,20 @@
 import 'dart:ui';
 
 class ThemeColors {
-  static const Color happy = Color(0xFFFFAC12);
-  static const Color sad = Color(0xFF254E7B);
-  static const Color calm = Color(0xFF007D51);
-  static const Color angry = Color(0xFF9D3E2E);
-  static const Color intrigued = Color(0xFF82D5B5);
-  static const Color bored = Color(0x99575757);
+  static const Color joy = Color(0xFFFFAC12);
+  static const Color sadness = Color(0xFFFFAC12);
+  static const Color calmness = Color(0xFF007D51);
+  static const Color anger = Color(0xFF007D51);
+  static const Color confidence = Color(0xFF2B8992);
+  static const Color anxiety = Color(0xFF2B8992);
+  static const Color like = Color(0xFFCA8A8A);
+  static const Color dislike = Color(0xFFCA8A8A);
+  static const Color excitement = Color(0xFFCA6218);
+  static const Color boredom = Color(0xFFCA6218);
+  static const Color satisfaction = Color(0xFF245A97);
+  static const Color disappointment = Color(0xFF245A97);
+  static const Color eagerness = Color(0xFF582F80);
+  static const Color fear = Color(0xFF582F80);
 
   static const List<Color> accountColors = <Color>[
     Color(0xFF005D57),
@@ -40,25 +48,5 @@ class ThemeColors {
   static const Color buttonHoverColor = Color(0xFF0CD392);
   static const Color focusColor = Color(0xCCFFFFFF);
   static const Color dividerColor = Color(0xAA282828);
-  static const Color cancelColor = Color(0xFFFF6951);
-
-  /// Convenience method to get a single account color with position i.
-  static Color accountColor(int i) {
-    return cycledColor(accountColors, i);
-  }
-
-  /// Convenience method to get a single bill color with position i.
-  static Color billColor(int i) {
-    return cycledColor(billColors, i);
-  }
-
-  /// Convenience method to get a single budget color with position i.
-  static Color budgetColor(int i) {
-    return cycledColor(budgetColors, i);
-  }
-
-  /// Gets a color from a list that is considered to be infinitely repeating.
-  static Color cycledColor(List<Color> colors, int i) {
-    return colors[i % colors.length];
-  }
+  static const Color errorColor = Color(0xFFFF6951);
 }
