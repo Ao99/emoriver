@@ -81,7 +81,7 @@ class _RadialFabState extends State<RadialFab>
             firstChild: FloatingActionButton(
               heroTag: 'fab-'+getRandString(5),
               onPressed: _toggle,
-              backgroundColor: Theme.of(context).accentColor,
+              backgroundColor: Theme.of(context).errorColor,
               child: Icon(Icons.close),
             ),
             secondChild: FloatingActionButton(

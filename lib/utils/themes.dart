@@ -15,7 +15,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: ThemeColors.primaryBackground,
       primaryColor: ThemeColors.primaryBackground,
-      accentColor: ThemeColors.cancelColor,
+      errorColor: ThemeColors.errorColor,
       focusColor: ThemeColors.focusColor,
       textTheme: _buildTextTheme(base.textTheme),
       inputDecorationTheme: const InputDecorationTheme(
