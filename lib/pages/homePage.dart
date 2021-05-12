@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = isDisplayDesktop(context);
+    final bool isPortrait = isDisplayVertical(context);
 
     return SafeArea(
       top: true,
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage>
           children: [
             FocusTraversalGroup(
               policy: OrderedTraversalPolicy(),
-              child: _buildTabBarWithViews(isDesktop),
+              child: _buildTabBarWithViews(isPortrait),
             ),
             _buildFab(),
           ]
@@ -82,16 +82,16 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildTabBarWithViews(bool isDesktop) {
-    final int quarterTurns = isDesktop ? 1 : 0;
-    final int revertQuarterTurns = isDesktop ? 4 - quarterTurns : 0;
-    final double logoSize = isDesktop ? 80 : 50;
+  Widget _buildTabBarWithViews(bool isVertical) {
+    final int quarterTurns = isVertical ? 0 : 1;
+    final int revertQuarterTurns = isVertical ? 0 : 4 - quarterTurns;
+    final double logoSize = isVertical ? 50 : 50;
 
     return _RowOrColumn(
-      isRow: isDesktop,
+      isRow: !isVertical,
       children: [
         _RowOrColumn(
-          isRow: !isDesktop,
+          isRow: isVertical,
           children: [
             SizedBox(
               width: logoSize,
