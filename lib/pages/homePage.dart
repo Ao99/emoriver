@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'tabs/tabs.dart';
 import '../widgets/rotatedTab.dart';
@@ -66,11 +65,11 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     final bool isDesktop = isDisplayDesktop(context);
 
-    return Scaffold(
-      body: SafeArea(
-        top: !isDesktop,
-        bottom: !isDesktop,
-        child: Stack(
+    return SafeArea(
+      top: true,
+      bottom: true,
+      child: Scaffold(
+        body: Stack(
           children: [
             FocusTraversalGroup(
               policy: OrderedTraversalPolicy(),
