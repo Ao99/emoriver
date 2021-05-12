@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-class CrossFadeButton extends StatefulWidget {
+class CrossFadeButton extends StatelessWidget {
   CrossFadeButton({
     Key key,
     this.size = 100,
@@ -26,28 +26,7 @@ class CrossFadeButton extends StatefulWidget {
   final Animation<double> animation;
 
   @override
-  _CrossFadeButtonState createState() => _CrossFadeButtonState();
-}
-
-class _CrossFadeButtonState extends State<CrossFadeButton> {
-  Animation<double> animation;
-
-  @override
-  void initState() {
-    super.initState();
-    animation = widget.animation;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    double elevation = widget.elevation;
-    Function onPressed = widget.onPressed;
-    String firstChild = widget.firstChild;
-    String secondChild = widget.secondChild;
-    double padding = widget.padding;
-    double size = widget.size;
-    Color color = widget.color;
-
     return AnimatedBuilder(
       animation: animation,
       builder: (context, widget) => Transform(
@@ -61,8 +40,8 @@ class _CrossFadeButtonState extends State<CrossFadeButton> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomCenter,
                 colors: animation.value<0.5
-                  ? [Colors.grey.shade400, color]
-                  : [color, Colors.grey.shade800],
+                ? [Colors.grey.shade400, color]
+                : [color, Colors.grey.shade800],
               )
           ),
           child: RawMaterialButton(
@@ -87,4 +66,3 @@ class _CrossFadeButtonState extends State<CrossFadeButton> {
     );
   }
 }
-
