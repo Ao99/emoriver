@@ -49,7 +49,7 @@ class AppTheme {
         letterSpacing: _letterSpacingOrNone(0.5),
       ),
       bodyText1: GoogleFonts.eczar(
-        fontSize: 40,
+        fontSize: 14,
         fontWeight: FontWeight.w400,
         letterSpacing: _letterSpacingOrNone(1.4),
       ),
