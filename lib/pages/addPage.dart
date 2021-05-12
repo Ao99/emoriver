@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import '../services/emotionService.dart';
 import '../models/emotion.dart';
 import '../utils/adaptive.dart';
+import '../utils/routes.dart';
+import '../widgets/crossFadeButton.dart';
+import '../widgets/radialMenu.dart';
 
 class AddPage extends StatefulWidget {
   @override
@@ -96,3 +100,45 @@ class AddPageArguments {
   AddPageArguments({this.emotion});
   final Emotion emotion;
 }
+
+Widget buildRadialMenu({
+  bool isOpen,
+  Function toggle,
+  Animation<double> menuAnimation,
+  Animation<double> buttonAnimation,
+}) => FutureBuilder(
+  future: EmotionService.getAllEmotions(),
+  builder: (BuildContext context,
+      AsyncSnapshot<List<Emotion>> snapshot) {
+    if(snapshot.hasData) {
+      final children = snapshot.data.map(
+              (e) => CrossFadeButton(
+            onPressed: (){
+              Navigator.pushNamed(
+                context,
+                AppRoute.add,
+                arguments: AddPageArguments(emotion: e),
+              );
+            },
+            color: Color(e.color),
+            firstChild: e.positive,
+            secondChild: e.negative,
+            animation: buttonAnimation,
+          )
+      ).toList();
+      return RadialMenu(
+        isOpen: isOpen,
+        toggle: toggle,
+        animation: menuAnimation,
+        radius: 120,
+        children: children,
+      );
+    } else if(snapshot.hasError) {
+      return Container();
+    } else {
+      return isOpen
+          ? Center(child: CircularProgressIndicator())
+          : Container();
+    }
+  },
+);

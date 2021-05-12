@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'tabs/tabs.dart';
 import '../widgets/rotatedTab.dart';
-import '../widgets/radialFab.dart';
+import '../widgets/radialMenu.dart';
 import '../widgets/crossFadeButton.dart';
 import '../widgets/rowOrColumn.dart';
 import '../utils/adaptive.dart';
 import '../utils/routes.dart';
+import '../utils/randomString.dart';
 import '../services/emotionService.dart';
 import '../models/emotion.dart';
 import './addPage.dart';
@@ -21,10 +22,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with TickerProviderStateMixin, RestorationMixin {
   TabController _tabController;
+  AnimationController radialMenuController;
+  Animation<double> radialMenuAnimation;
   AnimationController buttonController;
   Animation<double> buttonAnimation;
   RestorableInt tabIndex = RestorableInt(0);
-  bool showBlur = false;
+  bool isRadialMenuOpen = false;
 
   @override
   void initState() {
@@ -35,6 +38,15 @@ class _HomePageState extends State<HomePage>
           tabIndex.value = _tabController.index;
         });
       });
+    radialMenuController = AnimationController(
+        duration: Duration(milliseconds: 500),
+        vsync: this
+    );
+    radialMenuAnimation = CurvedAnimation(
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.easeOutQuad,
+      parent: radialMenuController,
+    );
     buttonController = AnimationController(
       duration: Duration(seconds: 3),
       vsync: this,
@@ -46,20 +58,19 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    tabIndex.dispose();
-    buttonController.dispose();
-    super.dispose();
-  }
-
-  @override
   String get restorationId => 'home_page';
 
   @override
   void restoreState(RestorationBucket oldBucket, bool initialRestore) {
     registerForRestoration(tabIndex, 'tab_index');
     _tabController.index = tabIndex.value;
+  }
+
+  toggleRadialMenu() {
+    setState(() => isRadialMenuOpen = !isRadialMenuOpen);
+    isRadialMenuOpen
+      ? radialMenuController.forward()
+      : radialMenuController.reverse();
   }
 
   @override
@@ -76,8 +87,30 @@ class _HomePageState extends State<HomePage>
               policy: OrderedTraversalPolicy(),
               child: _buildTabBarWithViews(isPortrait),
             ),
-            _buildFab(),
+            buildRadialMenu(
+              isOpen: isRadialMenuOpen,
+              toggle: toggleRadialMenu,
+              menuAnimation: radialMenuAnimation,
+              buttonAnimation: buttonAnimation,
+            ),
           ]
+        ),
+        floatingActionButton: AnimatedCrossFade(
+          firstChild: FloatingActionButton(
+            heroTag: 'fab-'+getRandString(5),
+            onPressed: toggleRadialMenu,
+            backgroundColor: Theme.of(context).errorColor,
+            child: Icon(Icons.close),
+          ),
+          secondChild: FloatingActionButton(
+            heroTag: 'fab-'+getRandString(5),
+            onPressed: toggleRadialMenu,
+            child: Icon(Icons.add),
+          ),
+          crossFadeState: isRadialMenuOpen ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+          duration: Duration(milliseconds: 500),
+          firstCurve: Curves.fastOutSlowIn,
+          secondCurve: Curves.easeOutQuad,
         ),
       ),
     );
@@ -123,40 +156,12 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildFab() => FutureBuilder(
-    future: EmotionService.getAllEmotions(),
-    builder: (BuildContext context,
-        AsyncSnapshot<List<Emotion>> snapshot) {
-      if(snapshot.hasData) {
-        final children = snapshot.data.map(
-          (e) => CrossFadeButton(
-            onPressed: (){
-              Navigator.pushNamed(
-                context,
-                AppRoute.add,
-                arguments: AddPageArguments(emotion: e),
-              );
-            },
-            color: Color(e.color),
-            firstChild: e.positive,
-            secondChild: e.negative,
-            animation: buttonAnimation,
-          )
-        ).toList();
-        return RadialFab(
-          radius: 120,
-          icon: Icons.add,
-          children: children,
-        );
-      } else if(snapshot.hasError) {
-        return Container();
-      } else {
-        return Container(
-          alignment: Alignment.bottomRight,
-          padding: EdgeInsets.all(16),
-          child: CircularProgressIndicator(),
-        );
-      }
-    },
-  );
+  @override
+  void dispose() {
+    _tabController.dispose();
+    tabIndex.dispose();
+    radialMenuController.dispose();
+    buttonController.dispose();
+    super.dispose();
+  }
 }
