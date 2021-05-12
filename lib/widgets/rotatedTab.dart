@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'rowOrColumn.dart';
 
 class RotatedTabBar extends StatelessWidget {
   RotatedTabBar({Key key, this.tabs, this.tabController, this.quarterTurns = 0}) : super(key: key);
@@ -82,67 +83,47 @@ class _RotatedTabState extends State<RotatedTab>
 
   @override
   Widget build(BuildContext context) {
-    Text titleText = Text(widget.title, style: Theme.of(context).textTheme.button);
+    final Text titleText = Text(
+      widget.title,
+      style: Theme.of(context).textTheme.button
+    );
+    final size = widget.isVertical
+      ? MediaQuery.of(context).size.height * 0.9
+      : MediaQuery.of(context).size.width;
+    final titleMultiplier = widget.isVertical ? 0.5 : 2;
+    final unitSize = (size - widget.leftOrTopPadding)
+        / (widget.tabCount + titleMultiplier);
 
-    if(widget.isVertical) {
-      return RotatedBox(
-        quarterTurns: widget.quarterTurns,
-        child: Column(
-          children: [
-            SizedBox(height: 18),
-            FadeTransition(
-              opacity: _iconFadeAnimation,
-              child: widget.icon,
+    return RotatedBox(
+      quarterTurns: widget.quarterTurns,
+      child: RowOrColumn(
+        isRow: !widget.isVertical,
+        children: [
+          FadeTransition(
+            opacity: _iconFadeAnimation,
+            child: SizedBox(
+              width: widget.isVertical ? 80 : unitSize,
+              height: widget.isVertical ? unitSize : 56,
+              child: widget.icon
             ),
-            SizedBox(height: 12),
-            FadeTransition(
-              opacity: _titleFadeAnimation,
-              child: SizeTransition(
-                sizeFactor: _titleSizeAnimation,
-                axis: Axis.vertical,
-                axisAlignment: -1,
+          ),
+          FadeTransition(
+            opacity: _titleFadeAnimation,
+            child: SizeTransition(
+              sizeFactor: _titleSizeAnimation,
+              axis: widget.isVertical
+                  ? Axis.vertical
+                  : Axis.horizontal,
+              axisAlignment: -1,
+              child: SizedBox(
+                width: widget.isVertical ? 80 : unitSize * titleMultiplier,
+                height: widget.isVertical ? unitSize * titleMultiplier : 56,
                 child: Center(child: ExcludeSemantics(child: titleText)),
               ),
             ),
-            SizedBox(height: 18),
-          ],
-        ),
-      );
-    } else {
-      final width = MediaQuery.of(context).size.width;
-      final expandedTitleWidthMultiplier = 2;
-      final unitWidth = (width - widget.leftOrTopPadding)
-          / (widget.tabCount + expandedTitleWidthMultiplier);
-
-      return RotatedBox(
-        quarterTurns: widget.quarterTurns,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 56),
-          child: Row(
-            children: [
-              FadeTransition(
-                opacity: _iconFadeAnimation,
-                child: SizedBox(
-                  width: unitWidth,
-                  child: widget.icon,
-                ),
-              ),
-              FadeTransition(
-                opacity: _titleFadeAnimation,
-                child: SizeTransition(
-                  sizeFactor: _titleSizeAnimation,
-                  axis: Axis.horizontal,
-                  axisAlignment: -1,
-                  child: SizedBox(
-                    width: unitWidth * expandedTitleWidthMultiplier,
-                    child: ExcludeSemantics(child: titleText),
-                  ),
-                ),
-              ),
-            ],
           ),
-        ),
-      );
-    }
+        ],
+      ),
+    );
   }
 }
