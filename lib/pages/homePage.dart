@@ -3,6 +3,7 @@ import 'tabs/tabs.dart';
 import '../widgets/rotatedTab.dart';
 import '../widgets/radialFab.dart';
 import '../widgets/crossFadeButton.dart';
+import '../widgets/rowOrColumn.dart';
 import '../utils/adaptive.dart';
 import '../utils/routes.dart';
 import '../services/emotionService.dart';
@@ -87,10 +88,10 @@ class _HomePageState extends State<HomePage>
     final int revertQuarterTurns = isVertical ? 0 : 4 - quarterTurns;
     final double logoSize = isVertical ? 50 : 50;
 
-    return _RowOrColumn(
+    return RowOrColumn(
       isRow: !isVertical,
       children: [
-        _RowOrColumn(
+        RowOrColumn(
           isRow: isVertical,
           children: [
             SizedBox(
@@ -158,17 +159,4 @@ class _HomePageState extends State<HomePage>
       }
     },
   );
-}
-
-class _RowOrColumn extends StatelessWidget {
-  const _RowOrColumn({Key key, this.isRow, this.children}) : super(key: key);
-  final bool isRow;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return isRow
-      ? Row(children: children)
-      : Column(children: children);
-  }
 }
