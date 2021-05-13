@@ -26,6 +26,7 @@ class AppTheme {
       scaffoldBackgroundColor: ThemeColors.backgroundColor,
       primaryColor: ThemeColors.primaryColor,
       accentColor: ThemeColors.accentColor,
+      buttonColor: ThemeColors.buttonColor,
       errorColor: ThemeColors.errorColor,
       focusColor: ThemeColors.focusColor,
       textTheme: _buildTextTheme(base.textTheme),
