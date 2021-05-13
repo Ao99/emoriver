@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    final bool isPortrait = isDisplayVertical(context);
+    final bool isPortrait = isDisplayPortrait(context);
 
     return SafeArea(
       top: true,
