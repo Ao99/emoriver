@@ -8,29 +8,32 @@ class AppTheme {
   static ThemeData buildTheme() {
     final base = ThemeData.dark();
     return ThemeData(
-      appBarTheme: AppBarTheme(brightness: Brightness.dark, elevation: 0),
+      brightness: Brightness.dark,
+      appBarTheme: AppBarTheme(
+        // color: ThemeColors.gray25,
+      ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: ThemeColors.buttonColor,
-        foregroundColor: ThemeColors.primaryBackground,
+        foregroundColor: ThemeColors.primaryColor,
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: Colors.transparent,
         inactiveTrackColor: Colors.transparent,
         activeTickMarkColor: Colors.grey.shade200,
         inactiveTickMarkColor: Colors.grey.shade800,
+        valueIndicatorColor: Colors.grey.shade700,
         thumbColor: ThemeColors.buttonColor,
         overlayColor: ThemeColors.buttonColor.withOpacity(0.2),
         trackHeight: 12.0,
       ),
-      scaffoldBackgroundColor: ThemeColors.primaryBackground,
-      primaryColor: ThemeColors.primaryBackground,
-      accentColor: ThemeColors.accentColor,
+      scaffoldBackgroundColor: ThemeColors.backgroundColor,
+      primaryColor: ThemeColors.primaryColor,
       errorColor: ThemeColors.errorColor,
       focusColor: ThemeColors.focusColor,
       textTheme: _buildTextTheme(base.textTheme),
       inputDecorationTheme: const InputDecorationTheme(
         labelStyle: TextStyle(
-          color: ThemeColors.gray,
+          color: Colors.white70,
           fontWeight: FontWeight.w500,
         ),
         filled: true,
@@ -42,7 +45,7 @@ class AppTheme {
         builders: {
           for (var type in TargetPlatform.values)
             type: SharedAxisPageTransitionsBuilder(
-              fillColor: ThemeColors.primaryBackground,
+              fillColor: ThemeColors.backgroundColor,
               transitionType: SharedAxisTransitionType.scaled,
             ),
         },
@@ -51,8 +54,7 @@ class AppTheme {
   }
 
   static TextTheme _buildTextTheme(TextTheme base) {
-    return base
-        .copyWith(
+    return base.copyWith(
       bodyText2: GoogleFonts.robotoCondensed(
         fontSize: 14,
         fontWeight: FontWeight.w400,
@@ -72,8 +74,7 @@ class AppTheme {
         fontWeight: FontWeight.w600,
         letterSpacing: _letterSpacingOrNone(1.4),
       ),
-    )
-        .apply(
+    ).apply(
       displayColor: Colors.white,
       bodyColor: Colors.white,
     );
