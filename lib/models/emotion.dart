@@ -28,4 +28,19 @@ class Emotion {
       'color': color,
     };
   }
+
+  @override
+  String toString() {
+    return 'Emotion(${this.positive}-${this.negative})';
+  }
+
+  @override
+  int get hashCode {
+    return this.id;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Emotion && other.id == this.id;
+  }
 }
