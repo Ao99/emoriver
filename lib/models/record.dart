@@ -6,36 +6,36 @@ class Record {
   Record({
     this.userDocId,
     this.emotions,
-    this.objects,
-    this.activities,
     this.time,
     this.location,
+    this.objects,
+    this.activities,
   });
 
   Record.fromJson(Map<String, dynamic> json) : this(
     userDocId: json["userDocId"] as String,
     emotions: json["emotions"] as Map<String, dynamic>,
-    objects: json["objects"] as List<dynamic>,
-    activities: json["activities"] as List<dynamic>,
     time: json["time"] as Timestamp,
     location: json["location"] as GeoPoint,
+    objects: json["objects"] as List<dynamic>,
+    activities: json["activities"] as List<dynamic>,
   );
 
   final String userDocId;
   final Map<String, dynamic> emotions;
-  final List<dynamic> objects;
-  final List<dynamic> activities;
   final Timestamp time;
   final GeoPoint location;
+  final List<dynamic> objects;
+  final List<dynamic> activities;
 
   Map<String, dynamic> toJson() {
     return {
       'userDocId': userDocId,
       'emotions': emotions,
-      'objects': objects,
-      'activities': activities,
       'time': time,
       'location': location,
+      'objects': objects,
+      'activities': activities,
     };
   }
 }
