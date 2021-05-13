@@ -9,9 +9,6 @@ class AppTheme {
     final base = ThemeData.dark();
     return ThemeData(
       brightness: Brightness.dark,
-      appBarTheme: AppBarTheme(
-        // color: ThemeColors.gray25,
-      ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: ThemeColors.buttonColor,
         foregroundColor: ThemeColors.primaryColor,
@@ -28,6 +25,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: ThemeColors.backgroundColor,
       primaryColor: ThemeColors.primaryColor,
+      accentColor: ThemeColors.accentColor,
       errorColor: ThemeColors.errorColor,
       focusColor: ThemeColors.focusColor,
       textTheme: _buildTextTheme(base.textTheme),

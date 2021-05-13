@@ -18,7 +18,6 @@ class RotatedTabBar extends StatelessWidget {
           labelPadding: EdgeInsets.zero,
           tabs: tabs,
           controller: tabController,
-          indicatorColor: Colors.transparent,
         ),
       ),
     );
