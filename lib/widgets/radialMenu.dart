@@ -10,8 +10,6 @@ class RadialMenu extends StatelessWidget {
     this.toggle,
     this.animation,
     this.radius = 100,
-    this.padding = 16,
-    this.alignment = Alignment.center,
     this.duration = const Duration(milliseconds: 500),
     this.children,
   }) : super(key: key);
@@ -20,8 +18,6 @@ class RadialMenu extends StatelessWidget {
   final Function toggle;
   final Animation<double> animation;
   final double radius;
-  final double padding;
-  final Alignment alignment;
   final Duration duration;
   final List<Widget> children;
 
@@ -47,7 +43,7 @@ class RadialMenu extends StatelessWidget {
                     return SizedBox.expand(
                       child: Stack(
                           alignment: Alignment.center,
-                          children: _buildExpandingButtons()
+                          children: _buildExpandingButtons(context)
                       ),
                     );
                   },
@@ -58,26 +54,38 @@ class RadialMenu extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildExpandingButtons() {
+  List<Widget> _buildExpandingButtons(BuildContext context) {
     int count = children.length;
     double step = 2 * pi / count;
     double rad = count % 2 == 0 ? pi : -pi/2;
     double maxDistance = radius;
-    return children.map(
-            (widget) {
-          Widget res = Transform.translate(
-              offset: Offset.fromDirection(
-                  rad,
-                  animation.value * maxDistance
-              ),
-              child: Transform.rotate(
-                angle: 2 * pi * animation.value,
-                child: widget,
-              )
-          );
-          rad += step;
-          return res;
-        }
+    int i = 0;
+    List<Widget> buttons = children.map(
+      (widget) => Transform.translate(
+          offset: Offset.fromDirection(
+              rad + (i++) * step,
+              animation.value * maxDistance
+          ),
+          child: Transform.rotate(
+            angle: 2 * pi * animation.value,
+            child: widget,
+          )
+      )
     ).toList();
+
+    buttons.add(Transform.scale(
+      scale: animation.value,
+      child: Transform.rotate(
+        angle: 2 * pi * animation.value,
+        child: FloatingActionButton(
+          heroTag: 'fab-'+getRandString(5),
+          onPressed: toggle,
+          backgroundColor: Theme.of(context).errorColor,
+          child: Icon(Icons.close),
+        ),
+      ),
+    ));
+
+    return buttons;
   }
 }
