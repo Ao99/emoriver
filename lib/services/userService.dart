@@ -9,8 +9,9 @@ class UserService {
     toFirestore: (user,_) => user.toJson(),
   );
 
-  static Future<DocumentSnapshot<User>> getUserByDocId(String docId) {
-    return userRef.doc(docId).get();
+  static Future<User> getUserByDocId(String docId) {
+    return userRef.doc(docId).get().then(
+      (snapshot) => snapshot.data());
   }
 
 }
