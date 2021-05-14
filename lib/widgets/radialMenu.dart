@@ -33,7 +33,7 @@ class RadialMenu extends StatelessWidget {
                   child: Container(color: Colors.transparent),
                 ),
               )
-            : Container(),
+            : SizedBox.shrink(),
           AnimatedSwitcher(
             duration: duration,
             child: isOpen
@@ -48,7 +48,7 @@ class RadialMenu extends StatelessWidget {
                     );
                   },
                 )
-              : Container(),
+              : SizedBox.shrink(),
           ),
         ]
     );

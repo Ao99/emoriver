@@ -27,7 +27,7 @@ class OverviewView extends StatelessWidget {
           )).toList(),
         );
       } else if(snapshot.hasError) {
-        return Container();
+        return SizedBox.shrink();
       } else {
         return Center(
           child: CircularProgressIndicator(),
