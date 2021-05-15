@@ -3,6 +3,10 @@
    <application
         android:label="emoriver"
         android:icon="@mipmap/ic_launcher">
+
+       <meta-data android:name="com.google.android.geo.API_KEY"
+                  android:value="AIzaSyDgpYkB-P0SoQvnEo9SjseW_lxxhaFWyjA"/>
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
