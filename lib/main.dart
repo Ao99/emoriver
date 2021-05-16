@@ -53,7 +53,7 @@ class _EmoriverAppState extends State<EmoriverApp> {
             setThemeMode: setThemeMode,
         ),
         AppRoute.login: (context) => LoginPage(),
-        AppRoute.add: (context) => RecordPage(userFuture: userFuture),
+        AppRoute.record: (context) => RecordPage(userFuture: userFuture),
       },
     );
   }

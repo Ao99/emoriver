@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage>
           items: _buildNavigationBarItems(),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){Navigator.of(context).pushNamed(AppRoute.add);},
+          onPressed: (){Navigator.of(context).pushNamed(AppRoute.record);},
           child: Icon(Icons.add),
         ),
       ),
