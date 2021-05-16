@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class SettingsView extends StatelessWidget {
-  final IconData tabIcon = Icons.settings;
+class LocationsPageView extends StatelessWidget {
+  final IconData tabIcon = Icons.location_on;
 
   @override
   Widget build(BuildContext context) {

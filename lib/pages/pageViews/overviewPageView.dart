@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:emoriver/services/recordService.dart';
 import 'package:emoriver/models/record.dart';
 
-class OverviewView extends StatelessWidget {
-  final IconData tabIcon = Icons.date_range;
-
+class OverviewPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
