@@ -7,7 +7,10 @@ import 'pageViews/locationsPageView.dart';
 import 'pageViews/reportsPageView.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  HomePage({Key key, this.themeMode, this.setThemeMode}) : super(key: key);
+
+  final ThemeMode themeMode;
+  final Function setThemeMode;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -68,15 +71,50 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildDrawerItems() => ListView(
-    children: [
-      UserAccountsDrawerHeader(
-        accountName: Text('user'),
-        accountEmail: Text('email'),
-        currentAccountPicture: CircleAvatar(child: FlutterLogo()),
-      ),
-    ],
-  );
+  Widget _buildDrawerItems() {
+    Map<ThemeMode, String> themeModes = {
+      ThemeMode.light: 'Light',
+      ThemeMode.dark: 'Dark',
+      ThemeMode.system: 'System default'
+    };
+
+    return ListView(
+      children: [
+        UserAccountsDrawerHeader(
+          accountName: Text('user'),
+          accountEmail: Text('email'),
+          currentAccountPicture: CircleAvatar(child: FlutterLogo()),
+        ),
+        Divider(),
+        ListTile(
+          onTap: () => showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: Text('Choose theme'),
+              content: Container(
+                height: 200,
+                child: Column(
+                  children: themeModes.entries.map((e) => RadioListTile<ThemeMode>(
+                      title: Text(e.value),
+                      value: e.key,
+                      groupValue: widget.themeMode,
+                      onChanged: (themeMode) {
+                        print(themeMode);
+                        widget.setThemeMode(themeMode);
+                        Navigator.of(context).pop();
+                      }
+                  )).toList(),
+                ),
+              ),
+            ),
+          ),
+          leading: Icon(Icons.color_lens_outlined),
+          title: Text('Theme'),
+          subtitle: Text(themeModes[widget.themeMode]),
+        ),
+      ],
+    );
+  }
 
   List<Widget> _buildPageViews() => [
     OverviewPageView(),

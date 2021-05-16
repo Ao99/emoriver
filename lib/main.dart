@@ -13,20 +13,30 @@ void main() async {
   runApp(EmoriverApp(firebaseApp: firebaseApp));
 }
 
-class EmoriverApp extends StatelessWidget {
-  EmoriverApp({Key key, this.firebaseApp}) : super(key: key);
-
+class EmoriverApp extends StatefulWidget {
+  const EmoriverApp({Key key, this.firebaseApp}) : super(key: key);
   final FirebaseApp firebaseApp;
+
+  @override
+  _EmoriverAppState createState() => _EmoriverAppState();
+}
+
+class _EmoriverAppState extends State<EmoriverApp> {
+  ThemeMode themeMode = ThemeMode.dark;
+
+  void setThemeMode(ThemeMode themeMode) => setState(() => this.themeMode = themeMode);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Emoriver',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.buildTheme(),
+      // theme: AppTheme.buildTheme(),
+      darkTheme: AppTheme.buildDarkTheme(),
+      themeMode: themeMode,
       initialRoute: AppRoute.home,
       routes: {
-        AppRoute.home: (context) => HomePage(),
+        AppRoute.home: (context) => HomePage(themeMode: themeMode, setThemeMode: setThemeMode),
         AppRoute.login: (context) => LoginPage(),
         AppRoute.add: (context) => RecordPage(),
       },

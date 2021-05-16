@@ -5,7 +5,7 @@ import 'package:animations/animations.dart';
 import 'colors.dart';
 
 class AppTheme {
-  static ThemeData buildTheme() {
+  static ThemeData buildDarkTheme() {
     final base = ThemeData.dark();
     return ThemeData(
       brightness: Brightness.dark,
