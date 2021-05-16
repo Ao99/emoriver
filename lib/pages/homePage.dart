@@ -99,7 +99,6 @@ class _HomePageState extends State<HomePage>
                       value: e.key,
                       groupValue: widget.themeMode,
                       onChanged: (themeMode) {
-                        print(themeMode);
                         widget.setThemeMode(themeMode);
                         Navigator.of(context).pop();
                       }
