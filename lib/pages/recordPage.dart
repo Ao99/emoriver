@@ -1,46 +1,62 @@
 import 'dart:collection';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:location/location.dart';
 import '../services/emotionService.dart';
+import '../services/recordService.dart';
 import '../models/emotion.dart';
-import '../models/user.dart';
-import '../services/userService.dart';
+import '../models/appUser.dart';
+import '../models/record.dart';
 import '../utils/adaptive.dart';
 import '../utils/colors.dart';
 import '../utils/location.dart';
+import '../utils/showSnackBar.dart';
 import '../widgets/crossFadeButton.dart';
 import '../widgets/radialMenu.dart';
 
+enum SavingStage {
+  pre_saving,
+  saving,
+}
+
+class RecordPageArguments {
+  RecordPageArguments({this.record});
+  final Record record;
+}
+
 class RecordPage extends StatefulWidget {
+  RecordPage({Key key, this.userFuture}) : super(key: key);
+
+  final Future<AppUser> userFuture;
+
   @override
   _RecordPageState createState() => _RecordPageState();
 }
 
 class _RecordPageState extends State<RecordPage>
     with TickerProviderStateMixin {
+  Record record;
   Map<Emotion, double> emotionsToSave = Map();
   Timestamp timeToSave = Timestamp.now();
   GeoPoint locationToSave;
   Set<String> objectsToSave = HashSet();
   Set<String> activitiesToSave = HashSet();
-  Set<String> savedObjects;
-  Set<String> savedActivities;
-  int numSavedDataToShow = 3;
-  Future<User> userFuture;
+  List<String> savedObjects;
+  List<String> savedActivities;
   TextEditingController objectTextController;
   TextEditingController activityTextController;
   AnimationController radialMenuController;
   Animation<double> radialMenuAnimation;
   AnimationController buttonController;
   Animation<double> buttonAnimation;
-  bool isRadialMenuOpen = true;
+  bool isRadialMenuOpen = false;
+  SavingStage savingStage = SavingStage.pre_saving;
 
   @override
   void initState() {
     super.initState();
-    userFuture = UserService.getUserByDocId('9t9D2s4i32rk0zsrWf4A');
     objectTextController = TextEditingController();
     activityTextController = TextEditingController();
     radialMenuController = AnimationController(
@@ -72,13 +88,16 @@ class _RecordPageState extends State<RecordPage>
 
   @override
   Widget build(BuildContext context) {
+    final RecordPageArguments arguments =
+      ModalRoute.of(context).settings.arguments as RecordPageArguments;
+    if(arguments != null) record = arguments.record;
     final bool isPortrait = isDisplayPortrait(context);
 
     return SafeArea(
       top: true,
       bottom: true,
       child: Scaffold(
-        appBar: AppBar(title: Text('Record My Emo')),
+        appBar: AppBar(title: Text('Add a new Emo record')),
         body: Stack(
           children: [
             _buildAddView(context),
@@ -86,8 +105,12 @@ class _RecordPageState extends State<RecordPage>
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {print('save');},
-          child: Icon(Icons.save_outlined),
+          onPressed: savingStage == SavingStage.pre_saving
+            ? _saveRecord
+            : () {},
+          child: savingStage == SavingStage.pre_saving
+              ? Icon(Icons.save_outlined)
+              : CircularProgressIndicator(),
         ),
       ),
     );
@@ -102,96 +125,135 @@ class _RecordPageState extends State<RecordPage>
   }
 
   Widget _buildAddView(BuildContext context) {
-    final List<Widget> emotionSliders = _buildEmotionSliders();
+    return Scrollbar(
+      child: ListView(
+        padding: EdgeInsets.all(8),
+        children: [
+          /*--- emotions ---*/
+          Text('Emotions'),
+          ..._buildEmotionSliders(),
+          DottedBorder(
+            color: Theme.of(context).textTheme.bodyText1.color.withOpacity(0.5),
+            borderType: BorderType.RRect,
+            radius: Radius.circular(8),
+            padding: EdgeInsets.zero,
+            strokeWidth: 3,
+            dashPattern: [6,6],
+            child: Container(
+              height: 50,
+              child: InkWell(
+                onTap: toggleRadialMenu,
+                child: SizedBox.expand(
+                  child: Icon(Icons.add, size: 50),
+                ),
+              ),
+            )),
 
-    return ListView(
-      children: [
-        /*--- emotions ---*/
-        AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          height: min(emotionsToSave.length.toDouble() * 50 + 15, 180),
-          child: Scrollbar(
-            child: ListView(
-              padding: EdgeInsets.all(8),
-              children: emotionSliders,
-            ),
+          SizedBox(height: 50),
+
+          Row(
+            children: [
+              /*--- time ---*/
+              Flexible(
+                flex: 1,
+                child: Column(
+                  children: [
+                    Text('Time'),
+                    Container(
+                      height: 50,
+                      color: Colors.grey.shade700,
+                      child: InkWell(
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: timeToSave.toDate(),
+                            firstDate: DateTime(1950),
+                            lastDate: DateTime.now(),
+                          ).then((date) {
+                            if(date == null) return;
+                            showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(timeToSave.toDate()),
+                            ).then((time) {
+                              if(time == null) return;
+                              setState(() {
+                                timeToSave = Timestamp.fromDate(
+                                    DateTime(date.year,date.month,date.day,time.hour,time.minute)
+                                );
+                              });
+                            });
+                          });
+                        },
+                        child: Center(
+                          child: Text(timeToSave.toDate().toIso8601String()),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /*--- location ---*/
+              Flexible(
+                flex: 1,
+                child: Column(
+                  children: [
+                    Text('Location'),
+                    FutureBuilder(
+                        future: getLocation(),
+                        builder: (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
+                          if(snapshot.hasData) {
+                            locationToSave = GeoPoint(snapshot.data.latitude, snapshot.data.longitude);
+                            return Container(
+                              height: 50,
+                              color: Colors.grey.shade700,
+                              child: InkWell(
+                                onTap: () {
+                                },
+                                child: Center(
+                                  child: Text('${locationToSave.latitude}, '
+                                      '${locationToSave.longitude}'),
+                                ),
+                              ),
+                            );
+                          }
+                          if(snapshot.hasError) {
+                            return Text(snapshot.error.toString());
+                          }
+                          return Center(child: CircularProgressIndicator());
+                        }
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ),
-        Container(
-          height: 50,
-          color: Theme.of(context).buttonColor,
-          child: InkWell(
-            onTap: toggleRadialMenu,
-            child: SizedBox.expand(
-              child: Icon(Icons.add, size: 50),
-            ),
+
+          SizedBox(height: 50),
+
+          Row(
+            children: [
+              /*--- objects ---*/
+              Flexible(
+                flex: 1,
+                child: Column(
+                  children: _buildTextFieldWithChips('object'),
+                ),
+              ),
+
+              /*--- activities ---*/
+              Flexible(
+                flex: 1,
+                child: Column(
+                  children: _buildTextFieldWithChips('activity'),
+                ),
+              ),
+            ],
           ),
-        ),
 
-        /*--- time ---*/
-        Text(timeToSave.toDate().toString()),
-        Container(
-          height: 50,
-          color: Colors.grey.shade700,
-          child: InkWell(
-            onTap: () {
-              showDatePicker(
-                context: context,
-                initialDate: timeToSave.toDate(),
-                firstDate: DateTime(1950),
-                lastDate: DateTime.now(),
-              ).then((date) {
-                if(date == null) return;
-                showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.fromDateTime(timeToSave.toDate()),
-                ).then((time) {
-                  if(time == null) return;
-                  setState(() {
-                    timeToSave = Timestamp.fromDate(
-                        DateTime(date.year,date.month,date.day,time.hour,time.minute)
-                    );
-                  });
-                });
-              });
-            },
-            child: SizedBox.expand(
-              child: Icon(Icons.add, size: 50),
-            ),
-          ),
-        ),
-
-        /*--- location ---*/
-        FutureBuilder(
-            future: getLocation(),
-            builder: (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
-              if(snapshot.hasData) {
-                locationToSave = GeoPoint(snapshot.data.latitude, snapshot.data.longitude);
-                return Text('${locationToSave.latitude}-${locationToSave.longitude}');
-              }
-              if(snapshot.hasError) {
-                return Text(snapshot.error.toString());
-              }
-              return Center(child: CircularProgressIndicator());
-            }
-        ),
-
-        /*--- objects ---*/
-        ..._buildTextFieldWithChips(
-          toSave: objectsToSave,
-          saved: savedObjects,
-          textController: objectTextController,
-          hint: 'person or object'
-        ),
-
-        /*--- activities ---*/
-        ..._buildTextFieldWithChips(
-            toSave: activitiesToSave,
-            saved: savedActivities,
-            textController: activityTextController,
-            hint: 'activity'
-        ),
-      ],
+          SizedBox(height: 50),
+        ],
+      ),
     );
   }
 
@@ -227,14 +289,14 @@ class _RecordPageState extends State<RecordPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
-              flex: 2,
+              flex: 5,
               child: SizedBox.expand(child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(e.key.negative),
               )),
             ),
             Flexible(
-              flex: 6,
+              flex: 15,
               child: Slider(
                 value: e.value,
                 min: -3,
@@ -254,10 +316,18 @@ class _RecordPageState extends State<RecordPage>
               ),
             ),
             Flexible(
-              flex: 2,
+              flex: 5,
               child: SizedBox.expand(child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(e.key.positive),
+              )),
+            ),
+            Flexible(
+              flex: 2,
+              child: SizedBox.expand(child: IconButton(
+                alignment: Alignment.centerLeft,
+                icon: Icon(Icons.remove_circle_outline),
+                onPressed: () => setState(() => emotionsToSave.remove(e.key)),
               )),
             ),
           ],
@@ -265,22 +335,56 @@ class _RecordPageState extends State<RecordPage>
       )).toList();
   }
 
-  Future<void> _prepareSavedData() async {
-    User user = await userFuture;
-    if(savedObjects == null) {
-      Map<String,dynamic> rawObjects = user.savedObjects;
-      List<String> keys = rawObjects.keys.toList()
-        ..sort((k1, k2) => rawObjects[k1].seconds - rawObjects[k2].seconds)
-        ..sublist(0,min(numSavedDataToShow, rawObjects.length));
-      setState(() => savedObjects = keys.toSet());
-    }
-    if(savedActivities == null) {
-      Map<String,dynamic> rawActivities = user.savedActivities;
-      List<String> keys = rawActivities.keys.toList()
-        ..sort((k1, k2) => rawActivities[k1].seconds - rawActivities[k2].seconds)
-        ..sublist(0,min(numSavedDataToShow, rawActivities.length));
-      setState(() => savedActivities = keys.toSet());
-    }
+  _buildTextFieldWithChips(String objectOrActivity) {
+    Set<String> toSave = objectOrActivity == 'object' ? objectsToSave : activitiesToSave;
+    List<String> saved = objectOrActivity == 'object' ? savedObjects : savedActivities;
+    TextEditingController textController = objectOrActivity == 'object' ? objectTextController : activityTextController;
+    String hint = objectOrActivity == 'object' ? 'person or object' : 'activity';
+
+    return <Widget>[
+      Wrap(
+        children: toSave.map((str) =>
+            InputChip(
+              label: Text(str),
+              onPressed: () {},
+              onDeleted: () => setState(() => toSave.remove(str)),
+            )).toList(),
+      ),
+      TypeAheadField(
+        textFieldConfiguration: TextFieldConfiguration(
+          controller: textController,
+          onSubmitted: (text)  => setState(() {
+            toSave.add(text);
+            textController.clear();
+          }),
+          decoration: InputDecoration(
+              hintText: 'Enter a related $hint',
+              border: OutlineInputBorder()
+          ),
+        ),
+        hideOnEmpty: true,
+        suggestionsCallback: (pattern) async {
+          if (saved == null) {
+            AppUser user = await widget.userFuture;
+            Map<String, dynamic> rawObjects = objectOrActivity == 'object'
+              ? user.savedObjects
+              : user.savedActivities;
+            saved = rawObjects.keys.toList()..sort(
+              (k1, k2) => rawObjects[k2].seconds - rawObjects[k1].seconds);
+          }
+          return pattern == ''
+            ? saved.where((str) => !toSave.contains(str))
+            : saved.where(
+              (str) => !toSave.contains(str) && str.contains(pattern));
+        },
+        itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
+        onSuggestionSelected: (suggestion)  => setState(() {
+          toSave.add(suggestion);
+          textController.clear();
+        }),
+      ),
+      Text(toSave.toString()),
+    ];
   }
 
   Widget _buildRadialMenu() => FutureBuilder(
@@ -291,7 +395,7 @@ class _RecordPageState extends State<RecordPage>
           (e) => CrossFadeButton(
             onPressed: (){
               setState(() {
-                emotionsToSave.putIfAbsent(e, () => 2);
+                emotionsToSave.putIfAbsent(e, () => 0);
                 toggleRadialMenu();
               });
             },
@@ -318,60 +422,32 @@ class _RecordPageState extends State<RecordPage>
     },
   );
 
-  _buildTextFieldWithChips({
-    Set<String> toSave,
-    Set<String> saved,
-    TextEditingController textController,
-    String hint
-  }) => <Widget>[
-    Wrap(
-      children: toSave.map((str) => InputChip(
-        label: Text(str),
-        onPressed: () {},
-        onDeleted: () => setState(() => toSave.remove(str)),
-      )).toList(),
-    ),
-    TextField(
-      controller: textController,
-      onSubmitted: (text) {
-        setState(() {
-          toSave.add(text);
-          textController.clear();
-        });
-      },
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter a related $hint',
-        suffixIcon: IconButton(
-          color: Theme.of(context).errorColor,
-          onPressed: textController.clear,
-          icon: Icon(Icons.clear),
-        ),
-      ),
-    ),
-    FutureBuilder(
-      future: _prepareSavedData(),
-      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-        if(snapshot.connectionState == ConnectionState.done) {
-          return Wrap(
-              children: [
-                Text('Suggestions: '),
-                ...saved
-                  .where((str) => !toSave.contains(str))
-                  .map((str) => InputChip(
-                    selectedColor: Theme.of(context).buttonColor,
-                    label: Text(str),
-                    onPressed: () => setState(() => toSave.add(str)),
-                  )).toList(),
-              ]
-          );
-        }
-        if(snapshot.hasError) {
-          return Text(snapshot.error.toString());
-        }
-        return Center(child: CircularProgressIndicator());
-      },
-    ),
-    Text(toSave.toString()),
-  ];
+  void _saveRecord() async {
+    if(emotionsToSave.length == 0) {
+      showSnackBar(context, 'Please add at least one Emo.');
+      return;
+    }
+
+    AppUser user = await widget.userFuture;
+    Record record = Record(
+      userDocId: user.docId,
+      emotions: emotionsToSave.map(
+        (key, value) => MapEntry(key.docId, value)),
+      time: timeToSave,
+      location: locationToSave,
+      objects: objectsToSave.toList(),
+      activities: activitiesToSave.toList(),
+      createdAt: Timestamp.now(),
+    );
+    setState(() => savingStage = SavingStage.saving);
+    RecordService.addRecord(record)
+      .then((_) {
+        showSnackBar(context, 'Successfully saved a record.', showDismiss: false);
+        Navigator.of(context).pop();
+      })
+      .catchError((error) {
+        setState(() => savingStage = SavingStage.pre_saving);
+        showSnackBar(context, error.toString());
+      });
+  }
 }

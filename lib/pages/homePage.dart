@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import '../utils/adaptive.dart';
 import '../utils/routes.dart';
+import '../models/appUser.dart';
 import 'pageViews/overviewPageView.dart';
 import 'pageViews/calendarPageView.dart';
 import 'pageViews/locationsPageView.dart';
 import 'pageViews/reportsPageView.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.themeMode, this.setThemeMode}) : super(key: key);
+  HomePage({Key key, this.userFuture, this.themeMode, this.setThemeMode}) : super(key: key);
 
+  final Future<AppUser> userFuture;
   final ThemeMode themeMode;
   final Function setThemeMode;
 
@@ -80,10 +82,21 @@ class _HomePageState extends State<HomePage>
 
     return ListView(
       children: [
-        UserAccountsDrawerHeader(
-          accountName: Text('user'),
-          accountEmail: Text('email'),
-          currentAccountPicture: CircleAvatar(child: FlutterLogo()),
+        FutureBuilder(
+          future: widget.userFuture,
+          builder: (BuildContext context, AsyncSnapshot<AppUser> snapshot) {
+            if(snapshot.hasData) {
+              return UserAccountsDrawerHeader(
+                accountName: Text(snapshot.data.username),
+                accountEmail: Text(snapshot.data.email),
+                currentAccountPicture: CircleAvatar(child: FlutterLogo()),
+              );
+            }
+            if(snapshot.hasError) {
+              return Text(snapshot.error.toString());
+            }
+            return Center(child: CircularProgressIndicator());
+          },
         ),
         Divider(),
         ListTile(
