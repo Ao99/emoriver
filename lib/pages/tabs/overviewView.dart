@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoriver/services/recordService.dart';
 import 'package:emoriver/models/record.dart';
 
@@ -29,8 +28,7 @@ class OverviewView extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () =>
-                      RecordService.deleteRecordByDocId(r.docId).then(
-                          (value) => null),
+                      RecordService.deleteRecordByDocId(r.docId),
                     child: Icon(Icons.delete_outline),
                   )
                 ],
