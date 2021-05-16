@@ -19,7 +19,7 @@ class Record {
     location: json["location"] as GeoPoint,
     objects: json["objects"] as List<dynamic>,
     activities: json["activities"] as List<dynamic>,
-    updatedAt: json["updatedAt"] as List<Timestamp>,
+    updatedAt: json["updatedAt"] as List<dynamic>,
 );
 
   String docId;
@@ -29,7 +29,7 @@ class Record {
   GeoPoint location;
   List<dynamic> objects;
   List<dynamic> activities;
-  List<Timestamp> updatedAt;
+  List<dynamic> updatedAt;
 
   Map<String, dynamic> toJson() {
     return {
