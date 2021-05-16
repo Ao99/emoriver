@@ -418,7 +418,7 @@ class _RecordPageState extends State<RecordPage>
           children: children,
         );
       } else if(snapshot.hasError) {
-        return SizedBox.shrink();
+        return Text(snapshot.error.toString());
       } else {
         return isRadialMenuOpen
           ? Center(child: CircularProgressIndicator())

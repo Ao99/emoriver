@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:emoriver/services/recordService.dart';
-import 'package:emoriver/models/record.dart';
+import '../../services/recordService.dart';
+import '../../models/record.dart';
 
 class OverviewPageView extends StatelessWidget {
   @override
@@ -36,7 +36,7 @@ class OverviewPageView extends StatelessWidget {
           )).toList(),
         );
       } else if(snapshot.hasError) {
-        return SizedBox.shrink();
+        return Text(snapshot.error.toString());
       } else {
         return Center(
           child: CircularProgressIndicator(),
