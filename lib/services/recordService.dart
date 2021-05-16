@@ -9,8 +9,22 @@ class RecordService {
       toFirestore: (record,_) => record.toJson(),
     );
 
-  static Future<QuerySnapshot<Record>> getRecordsByUserDocId(String userDocId) {
-    return recordRef.where('userDocId', isEqualTo: userDocId).get();
+  static Future<List<Record>> getRecordsByUserDocId(String userDocId) {
+    return recordRef.where('userDocId', isEqualTo: userDocId).get().then(
+      (snapshot) => snapshot.docs.map((doc) {
+        Record r = doc.data();
+        r.docId = doc.id;
+        return r;
+      }
+    ).toList());
+  }
+
+  static Future<DocumentReference<Record>> addRecord(Record record) {
+    return recordRef.add(record);
+  }
+  
+  static Future<DocumentReference<Record>> deleteRecordByDocId(String docId) {
+    return recordRef.doc(docId).delete();
   }
 
 }

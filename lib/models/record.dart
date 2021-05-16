@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-@immutable
 class Record {
   Record({
+    this.docId,
     this.userDocId,
     this.emotions,
     this.time,
@@ -25,6 +24,7 @@ class Record {
     updatedAt: json["updatedAt"] as Timestamp,
 );
 
+  String docId;
   final String userDocId;
   final Map<String, dynamic> emotions;
   final Timestamp time;

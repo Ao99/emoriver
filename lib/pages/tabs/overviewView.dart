@@ -16,14 +16,27 @@ class OverviewView extends StatelessWidget {
   Widget _buildOverview() => FutureBuilder(
     future: RecordService.getRecordsByUserDocId('9t9D2s4i32rk0zsrWf4A'),
     builder: (BuildContext context,
-        AsyncSnapshot<QuerySnapshot<Record>> snapshot) {
+        AsyncSnapshot<List<Record>> snapshot) {
       if(snapshot.hasData) {
-        final records = snapshot.data.docs.map(
-          (doc) => doc.data(),
-        ).toList();
         return ListView(
-          children: records.map((r) => Text(
-            r.toJson().toString()
+          children: snapshot.data.map((r) => Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 400,
+                    child: Text(r.toJson()['emotions'].toString()),
+                  ),
+                  ElevatedButton(
+                    onPressed: () =>
+                      RecordService.deleteRecordByDocId(r.docId).then(
+                          (value) => null),
+                    child: Icon(Icons.delete_outline),
+                  )
+                ],
+              ),
+              Divider(),
+            ],
           )).toList(),
         );
       } else if(snapshot.hasError) {
