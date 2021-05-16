@@ -9,7 +9,6 @@ class Record {
     this.location,
     this.objects,
     this.activities,
-    this.createdAt,
     this.updatedAt,
   });
 
@@ -20,19 +19,17 @@ class Record {
     location: json["location"] as GeoPoint,
     objects: json["objects"] as List<dynamic>,
     activities: json["activities"] as List<dynamic>,
-    createdAt: json["createdAt"] as Timestamp,
-    updatedAt: json["updatedAt"] as Timestamp,
+    updatedAt: json["updatedAt"] as List<Timestamp>,
 );
 
   String docId;
-  final String userDocId;
-  final Map<String, dynamic> emotions;
-  final Timestamp time;
-  final GeoPoint location;
-  final List<dynamic> objects;
-  final List<dynamic> activities;
-  final Timestamp createdAt;
-  final Timestamp updatedAt;
+  String userDocId;
+  Map<String, dynamic> emotions;
+  Timestamp time;
+  GeoPoint location;
+  List<dynamic> objects;
+  List<dynamic> activities;
+  List<Timestamp> updatedAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -42,7 +39,6 @@ class Record {
       'location': location,
       'objects': objects,
       'activities': activities,
-      'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
   }

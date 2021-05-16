@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -39,10 +38,6 @@ class _RecordPageState extends State<RecordPage>
     with TickerProviderStateMixin {
   Record record;
   Map<Emotion, double> emotionsToSave = Map();
-  Timestamp timeToSave = Timestamp.now();
-  GeoPoint locationToSave;
-  Set<String> objectsToSave = HashSet();
-  Set<String> activitiesToSave = HashSet();
   List<String> savedObjects;
   List<String> savedActivities;
   TextEditingController objectTextController;
@@ -87,11 +82,21 @@ class _RecordPageState extends State<RecordPage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final RecordPageArguments arguments =
-      ModalRoute.of(context).settings.arguments as RecordPageArguments;
-    if(arguments != null) record = arguments.record;
+  Widget build(BuildContext context) {    
     final bool isPortrait = isDisplayPortrait(context);
+    final RecordPageArguments arguments =
+    ModalRoute.of(context).settings.arguments as RecordPageArguments;
+    record = arguments != null
+      ? arguments.record
+      : Record(
+          userDocId: null,
+          emotions: null,
+          time: Timestamp.now(),
+          location: null,
+          objects: <String>[],
+          activities: <String>[],
+          updatedAt: <Timestamp>[],
+        );
 
     return SafeArea(
       top: true,
@@ -106,7 +111,7 @@ class _RecordPageState extends State<RecordPage>
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: savingStage == SavingStage.pre_saving
-            ? _saveRecord
+            ? () => _saveRecord(record)
             : () {},
           child: savingStage == SavingStage.pre_saving
               ? Icon(Icons.save_outlined)
@@ -166,18 +171,18 @@ class _RecordPageState extends State<RecordPage>
                         onTap: () {
                           showDatePicker(
                             context: context,
-                            initialDate: timeToSave.toDate(),
+                            initialDate: record.time.toDate(),
                             firstDate: DateTime(1950),
                             lastDate: DateTime.now(),
                           ).then((date) {
                             if(date == null) return;
                             showTimePicker(
                               context: context,
-                              initialTime: TimeOfDay.fromDateTime(timeToSave.toDate()),
+                              initialTime: TimeOfDay.fromDateTime(record.time.toDate()),
                             ).then((time) {
                               if(time == null) return;
                               setState(() {
-                                timeToSave = Timestamp.fromDate(
+                                record.time = Timestamp.fromDate(
                                     DateTime(date.year,date.month,date.day,time.hour,time.minute)
                                 );
                               });
@@ -185,7 +190,7 @@ class _RecordPageState extends State<RecordPage>
                           });
                         },
                         child: Center(
-                          child: Text(timeToSave.toDate().toIso8601String()),
+                          child: Text(record.time.toDate().toIso8601String()),
                         ),
                       ),
                     ),
@@ -203,7 +208,7 @@ class _RecordPageState extends State<RecordPage>
                         future: getLocation(),
                         builder: (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
                           if(snapshot.hasData) {
-                            locationToSave = GeoPoint(snapshot.data.latitude, snapshot.data.longitude);
+                            record.location = GeoPoint(snapshot.data.latitude, snapshot.data.longitude);
                             return Container(
                               height: 50,
                               color: Colors.grey.shade700,
@@ -211,8 +216,8 @@ class _RecordPageState extends State<RecordPage>
                                 onTap: () {
                                 },
                                 child: Center(
-                                  child: Text('${locationToSave.latitude}, '
-                                      '${locationToSave.longitude}'),
+                                  child: Text('${record.location.latitude}, '
+                                      '${record.location.longitude}'),
                                 ),
                               ),
                             );
@@ -336,7 +341,7 @@ class _RecordPageState extends State<RecordPage>
   }
 
   _buildTextFieldWithChips(String objectOrActivity) {
-    Set<String> toSave = objectOrActivity == 'object' ? objectsToSave : activitiesToSave;
+    List<String> toSave = objectOrActivity == 'object' ? record.objects : record.activities;
     List<String> saved = objectOrActivity == 'object' ? savedObjects : savedActivities;
     TextEditingController textController = objectOrActivity == 'object' ? objectTextController : activityTextController;
     String hint = objectOrActivity == 'object' ? 'person or object' : 'activity';
@@ -422,23 +427,18 @@ class _RecordPageState extends State<RecordPage>
     },
   );
 
-  void _saveRecord() async {
+  void _saveRecord(Record record) async {
     if(emotionsToSave.length == 0) {
-      showSnackBar(context, 'Please add at least one Emo.');
+      showSnackBar(context, 'Please add at least one emotion.', showDismiss: true);
       return;
     }
 
     AppUser user = await widget.userFuture;
-    Record record = Record(
-      userDocId: user.docId,
-      emotions: emotionsToSave.map(
-        (key, value) => MapEntry(key.docId, value)),
-      time: timeToSave,
-      location: locationToSave,
-      objects: objectsToSave.toList(),
-      activities: activitiesToSave.toList(),
-      createdAt: Timestamp.now(),
-    );
+    record.userDocId = user.docId;
+    record.emotions = emotionsToSave.map(
+      (key, value) => MapEntry(key.docId, value));
+    record.updatedAt.add(Timestamp.now());
+
     setState(() => savingStage = SavingStage.saving);
     RecordService.addRecord(record)
       .then((_) {
@@ -447,7 +447,7 @@ class _RecordPageState extends State<RecordPage>
       })
       .catchError((error) {
         setState(() => savingStage = SavingStage.pre_saving);
-        showSnackBar(context, error.toString());
+        showSnackBar(context, error.toString(), showDismiss: true);
       });
   }
 }
